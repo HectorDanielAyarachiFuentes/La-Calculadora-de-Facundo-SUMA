@@ -246,6 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const numDigits = paddedNumbers[0].length;
         const resultY = Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT;
         let currentResultString = '';
+        let allCarries = []; // *** NUEVO: Array para "recordar" las llevadas ***
 
         // Ajuste para la posición del punto decimal en el resultado final
         const decimalResultX = END_X - (decimalPos * COLUMN_WIDTH) + COLUMN_WIDTH / 2;
@@ -278,6 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (prevCarryElement) prevCarryElement.remove();
 
             if (carry > 0) {
+                 // *** NUEVO: Guardamos la llevada y su posición ***
+                allCarries.push({ value: carry, x: x - COLUMN_WIDTH });
                 // La llevada se dibuja una columna a la izquierda
                 svg.appendChild(createSvgElement('text', { x: x - COLUMN_WIDTH, y: Y_CARRY, class: 'digit carry-text' }, carry));
             }
@@ -296,6 +299,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Eliminar cualquier llevada flotante que pudiera quedar
         const finalFloatingCarry = svg.querySelector('.carry-text');
         if (finalFloatingCarry) finalFloatingCarry.remove();
+        
+        // *** NUEVO: Volvemos a dibujar todas las llevadas para que se queden fijas ***
+        allCarries.forEach(c => {
+            svg.appendChild(createSvgElement('text', { x: c.x, y: Y_CARRY, class: 'digit carry-text' }, c.value));
+        });
 
         // Dibujar el punto decimal en la posición correcta del resultado
         if (decimalPos > 0) {
@@ -320,7 +328,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (step.carryIn > 0) explanation += ` + ${step.carryIn} (llevada)`;
             explanation += ` = ${step.sum}.`;
             // Indicar lo que se escribe y la llevada de salida
-            explanation += ` Se escribe ${step.resultDigit} y se lleva ${step.carryOut}.`;
+            explanation += ` Se escribe ${step.resultDigit}`;
+            if (step.carryOut > 0) explanation += ` y se lleva ${step.carryOut}`;
+            explanation += `.`;
             li.innerHTML = explanation;
             procedureList.appendChild(li);
         });
@@ -453,35 +463,63 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupVoiceReader() {
         if (!procedureList) return;
 
-        procedureList.addEventListener('click', (event) => {
+        // Creamos un handler separado para poder añadir/eliminar listeners si fuera necesario.
+        const handleProcedureClick = (event) => {
             const listItem = event.target.closest('li');
-            if (!listItem) return;
+            if (!listItem || !listItem.dataset.stepIndex) return;
 
-            const textoCompleto = listItem.textContent;
-            // Intentamos extraer los números para una lectura más estructurada
-            const numerosEnTexto = textoCompleto.match(/(\d+)(?:\s*[\+\s]\s*(\d+))?(?:\s*=\s*(\d+))?/);
+            const stepIndex = parseInt(listItem.dataset.stepIndex, 10);
+            const stepData = procedureSteps[stepIndex];
 
-            if (numerosEnTexto) {
-                const num1 = parseInt(numerosEnTexto[1]);
-                const num2 = numerosEnTexto[2] ? parseInt(numerosEnTexto[2]) : null;
-                const resultadoParcial = numerosEnTexto[3] ? parseInt(numerosEnTexto[3]) : null;
-
-                let fraseVoz = "";
-                if (num2 !== null && resultadoParcial !== null) { // Formato: "Se suma X + Y = Z"
-                    fraseVoz = `Se suma ${numeroALetras(num1)} más ${numeroALetras(num2)}, que da ${numeroALetras(resultadoParcial)}`;
-                } else if (num2 !== null) { // Formato: "Se suma X + Y" (para la explicación del paso)
-                     fraseVoz = `En esta columna, sumamos ${numeroALetras(num1)} más ${numeroALetras(num2)}`;
-                } else if (resultadoParcial !== null) { // Formato: "Resultado: Z"
-                    fraseVoz = `El resultado final es ${numeroALetras(resultadoParcial)}`;
-                } else { // Si solo hay un número o no se puede parsear
-                     fraseVoz = textoCompleto;
-                }
-                 leerEnVoz(fraseVoz.replace(/ +/g, ' ').trim()); // Limpiar espacios extra y leer
-
-            } else {
-                leerEnVoz(textoCompleto); // Leer el texto completo si no se pueden extraer números
+            if (!stepData) {
+                // Fallback: si no encontramos los datos, leemos el texto directamente.
+                leerEnVoz(listItem.textContent);
+                return;
             }
-        });
+
+            // --- Construcción de la narración didáctica desde los datos estructurados ---
+            let descripcion = `Columna ${stepIndex + 1}. ¡Vamos a sumar! `;
+
+            // 1. Describir los números de la columna
+            const numerosEnPalabras = stepData.digits.map(d => numeroALetras(d));
+            let listaDeNumeros;
+            if (numerosEnPalabras.length > 2) {
+                const todosMenosElUltimo = numerosEnPalabras.slice(0, -1);
+                const ultimo = numerosEnPalabras[numerosEnPalabras.length - 1];
+                listaDeNumeros = todosMenosElUltimo.join(', ') + ' y ' + ultimo;
+            } else if (numerosEnPalabras.length === 2) {
+                listaDeNumeros = numerosEnPalabras.join(' y ');
+            } else {
+                listaDeNumeros = numerosEnPalabras[0] || '';
+            }
+
+            descripcion += `Juntamos ${listaDeNumeros}. `;
+            
+            // 2. Describir la llevada que viene de la columna anterior
+            if (stepData.carryIn > 0) {
+                descripcion += `No nos olvidemos de sumar el ${numeroALetras(stepData.carryIn)} que guardamos antes. `;
+            }
+
+            // 3. Dar el resultado de la suma de la columna
+            descripcion += `Todo eso nos da ${numeroALetras(stepData.sum)}. `;
+
+            // 4. Describir el dígito que se escribe
+            descripcion += `Entonces, abajo ponemos un ${numeroALetras(stepData.resultDigit)}. `;
+
+            // 5. Describir la nueva llevada que se genera (si la hay)
+            if (stepData.carryOut > 0) {
+                descripcion += `Y guardamos el ${numeroALetras(stepData.carryOut)} para la próxima columna.`;
+            } else {
+                descripcion += `¡Genial! No necesitamos guardar nada para la próxima columna.`;
+            }
+
+            leerEnVoz(descripcion.replace(/ +/g, ' ').trim());
+        };
+
+        // Añadimos el listener, asegurándonos de que la lógica anterior se reemplace.
+        // Si hay un listener previo, esta nueva asignación lo sobrescribe.
+        procedureList.removeEventListener('click', handleProcedureClick); // Removemos por si acaso
+        procedureList.addEventListener('click', handleProcedureClick);
     }
 
     // --- INICIALIZACIÓN ---
