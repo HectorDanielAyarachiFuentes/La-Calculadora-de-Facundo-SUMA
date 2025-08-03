@@ -1,0 +1,201 @@
+:root {
+    --bg-color: #f7f9fc;
+    --container-bg: #ffffff;
+    --primary-blue: #007bff;
+    --primary-green: #28a745;
+    --carry-orange: #fd7e14;
+    --result-dark: #343a40;
+    --line-color: #dee2e6;
+    --text-light: #6c757d;
+    --pill-bg: #e9ecef;
+    --font-family: 'Nunito', sans-serif;
+    --shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--result-dark);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem 1rem;
+    min-height: 100vh;
+}
+
+.container {
+    background: var(--container-bg);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 550px;
+    text-align: center;
+}
+
+header h1 {
+    font-weight: 900;
+    font-size: 2.5rem;
+    margin: 0;
+    color: var(--primary-blue);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin: 0.5rem 0 2.5rem;
+}
+
+.input-section {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+#numberInput {
+    flex-grow: 1;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--line-color);
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    transition: border-color 0.3s;
+}
+#numberInput:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+}
+
+.btn-add {
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: var(--primary-blue);
+    color: white;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+.btn-add:hover { background-color: #0056b3; }
+
+#number-list-container {
+    text-align: left;
+    margin-bottom: 2rem;
+    min-height: 60px;
+}
+#number-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+#number-list li {
+    background-color: var(--pill-bg);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    animation: pop-in 0.3s ease-out;
+}
+
+.controls {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn-calculate, .btn-reset {
+    padding: 0.9rem 1.8rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-calculate { background-color: var(--primary-green); color: white; }
+.btn-calculate:hover { background-color: #218838; transform: translateY(-2px); }
+.btn-calculate:disabled { background-color: #94d3a2; cursor: not-allowed; transform: none; }
+
+.btn-reset { background-color: var(--text-light); color: white; }
+.btn-reset:hover { background-color: #5a6268; }
+
+#calculation-area {
+    background: #fdfdff;
+    border: 1px dashed var(--line-color);
+    border-radius: 10px;
+    min-height: 150px;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    padding: 10px 0;
+}
+
+#calculation-svg { width: 100%; height: 150px; }
+.digit { font-size: 32px; font-weight: 700; text-anchor: middle; }
+.num1-text { fill: var(--primary-blue); }
+.num2-text { fill: var(--primary-green); }
+.carry-text { fill: var(--carry-orange); font-size: 20px; font-weight: 900; animation: fadeIn 0.5s ease; }
+.result-text { fill: var(--result-dark); font-weight: 900; }
+.decimal-point { font-size: 32px; font-weight: 900; fill: var(--result-dark); text-anchor: middle; }
+.sum-line { stroke: var(--result-dark); stroke-width: 2.5; border-radius: 2px; }
+/* Estilo para el signo de suma en el SVG */
+.plus-sign-svg { fill: var(--text-light); font-weight: 700; }
+
+#explanation-box {
+    background: #e9f5ff;
+    border-left: 5px solid var(--primary-blue);
+    padding: 1rem;
+    border-radius: 8px;
+    min-height: 50px;
+    text-align: left;
+    margin-bottom: 2rem;
+    transition: background-color 0.3s;
+}
+#explanation-text { margin: 0; font-size: 1.1rem; color: #004085; transition: opacity 0.5s; }
+
+#history-section { border-top: 1px solid var(--line-color); padding-top: 1.5rem; }
+#history-section h2 { margin-top: 0; margin-bottom: 0.5rem; }
+#history-list { list-style: none; padding: 0; margin: 0; font-size: 1.1rem; color: var(--text-light); }
+#history-list li { padding: 0.3rem 0; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop-in {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+@keyframes carry-fly {
+    from { transform: translateY(20px) scale(0.5); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+.carry-animation { animation: carry-fly 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.highlight-rect { fill: #ffdd00; opacity: 0.4; transition: all 0.5s ease-in-out; }
+
+
+
+
+
+
+/* ... (todo el CSS anterior es igual) ... */
+
+#calculation-area {
+    background: #fdfdff;
+    border: 1px dashed var(--line-color);
+    border-radius: 10px;
+    /* Aumentamos la altura mínima para dar espacio a más números */
+    min-height: 200px; 
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    padding: 10px 0;
+}
+
+#calculation-svg { width: 100%; height: auto; } /* Altura automática para adaptarse al viewBox */
+
+/* ... (el resto del CSS es igual) ... */
+
