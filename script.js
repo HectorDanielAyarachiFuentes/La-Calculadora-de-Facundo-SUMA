@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 2. ESTADO GLOBAL ---
     let numbersToSum = [];
-    let calculationHistory = []; // Almacena todos los cálculos de la sesión
+    let calculationHistory = [];
+    let editingIndex = null; // <-- NUEVA VARIABLE DE ESTADO
 
     // --- CONSTANTES SVG ---
     const SVG_WIDTH = 460; const COLUMN_WIDTH = 35; const END_X = SVG_WIDTH - 40;
@@ -27,30 +28,30 @@ document.addEventListener('DOMContentLoaded', () => {
     calculateBtn.addEventListener('click', () => startCalculation());
     resetBtn.addEventListener('click', resetCalculator);
 
-    // --- INICIO DE LA CORRECCIÓN 1 ---
+    // MANEJADORES DE REPETICIÓN
     replayBtn.addEventListener('click', () => {
-        // Vuelve a ejecutar el último cálculo del historial
-        if (calculationHistory.length > 0) {
-            const lastCalcData = calculationHistory[calculationHistory.length - 1];
-            startCalculation(lastCalcData);
-        }
+        if (calculationHistory.length > 0) startCalculation(calculationHistory[calculationHistory.length - 1]);
     });
-
     historyList.addEventListener('click', (e) => {
         const li = e.target.closest('li');
-        if (li && li.dataset.index) {
-            const index = parseInt(li.dataset.index, 10);
-            const dataToReplay = calculationHistory[index];
-            if (dataToReplay) {
-                startCalculation(dataToReplay);
-            }
+        if (li && li.dataset.index) startCalculation(calculationHistory[parseInt(li.dataset.index, 10)]);
+    });
+
+    // --- INICIO DE LA CORRECCIÓN: Delegación de eventos para editar y borrar ---
+    operandsContainer.addEventListener('click', (e) => {
+        // Si estamos en modo de cálculo, no hacemos nada.
+        if (calculateBtn.disabled && editingIndex === null) return;
+
+        if (e.target.classList.contains('delete-btn')) {
+            handleDeleteNumber(e.target.dataset.index);
+        } else if (e.target.classList.contains('operand-text')) {
+            handleEnterEditMode(e.target.dataset.index);
         }
     });
-    // --- FIN DE LA CORRECCIÓN 1 ---
+    // --- FIN DE LA CORRECCIÓN ---
 
-    operandsContainer.addEventListener('click', (e) => { if (e.target.classList.contains('delete-btn')) handleDeleteNumber(e); });
 
-    // --- 4. LÓGICA DE LA INTERFAZ ---
+    // --- 4. LÓGICA DE LA INTERFAZ (CRUD de números) ---
     function addNumber() {
         const value = numberInput.value.trim().replace(',', '.');
         if (value && isFinite(Number(value))) {
@@ -58,36 +59,84 @@ document.addEventListener('DOMContentLoaded', () => {
             renderOperands();
             numberInput.value = '';
             numberInput.focus();
-        } else { 
-            setExplanation(`"${numberInput.value}" no es un número válido.`);
-        }
+        } else { setExplanation(`"${numberInput.value}" no es un número válido.`); }
     }
 
-    function renderOperands() {
-        // ... (sin cambios en esta función)
-        operandsContainer.innerHTML = '';
-        if (numbersToSum.length === 0) {
-            operandsContainer.innerHTML = `<div style="color: #ccc; font-size: 1.2rem; width:100%; text-align:center; font-weight:400; padding: 4rem 0;">Tu suma aparecerá aquí</div>`;
-        }
-        numbersToSum.forEach((num, index) => {
-            const item = document.createElement('div');
-            item.className = 'operand-item';
-            item.innerHTML = `<span class="operand-text">${num.replace('.',',')}</span><button class="delete-btn" data-index="${index}">×</button>`;
-            operandsContainer.appendChild(item);
-        });
-        calculateBtn.disabled = numbersToSum.length < 2;
-        if (numbersToSum.length >= 2) setExplanation("¡Listo para sumar! O sigue añadiendo números.");
-    }
-
-    function handleDeleteNumber(event) {
-        // ... (sin cambios en esta función)
-        const index = parseInt(event.target.dataset.index, 10);
+    function handleDeleteNumber(index) {
+        editingIndex = null; // Salir de modo edición si se está editando
         numbersToSum.splice(index, 1);
         renderOperands();
     }
 
+    function handleEnterEditMode(index) {
+        editingIndex = parseInt(index, 10);
+        renderOperands();
+    }
+
+    function handleSaveEdit(event) {
+        const input = event.target;
+        const index = editingIndex;
+        if (index === null) return;
+
+        const newValue = input.value.trim().replace(',', '.');
+
+        if (newValue && isFinite(Number(newValue))) {
+            numbersToSum[index] = newValue;
+        } else {
+            setExplanation(`"${input.value}" no es válido. Se restauró el valor anterior.`);
+        }
+        
+        editingIndex = null; // Salir del modo edición
+        renderOperands();
+    }
+
+    function renderOperands() {
+        operandsContainer.innerHTML = '';
+        if (numbersToSum.length === 0) {
+            operandsContainer.innerHTML = `<div style="color: #ccc; font-size: 1.2rem; width:100%; text-align:center; font-weight:400; padding: 4rem 0;">Tu suma aparecerá aquí</div>`;
+        }
+
+        numbersToSum.forEach((num, index) => {
+            const item = document.createElement('div');
+            item.className = 'operand-item';
+            
+            const deleteButtonHTML = `<button class="delete-btn" data-index="${index}">×</button>`;
+
+            if (index === editingIndex) {
+                // MODO EDICIÓN: Renderizar un input
+                item.innerHTML = `<input type="text" class="edit-input" value="${num.replace('.',',')}" /> ${deleteButtonHTML}`;
+                const input = item.querySelector('.edit-input');
+                setTimeout(() => { input.focus(); input.select(); }, 0); // Focus y seleccionar texto
+                
+                input.addEventListener('blur', handleSaveEdit);
+                input.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+                    if (e.key === 'Escape') { editingIndex = null; renderOperands(); }
+                });
+            } else {
+                // MODO VISUALIZACIÓN: Renderizar un span
+                item.innerHTML = `<span class="operand-text" data-index="${index}">${num.replace('.',',')}</span> ${deleteButtonHTML}`;
+            }
+            operandsContainer.appendChild(item);
+        });
+
+        calculateBtn.disabled = numbersToSum.length < 2 || editingIndex !== null;
+        if (editingIndex !== null) {
+            setExplanation("Editando... Pulsa Enter para guardar, o Esc para cancelar.");
+        } else if (numbersToSum.length >= 2) {
+            setExplanation("¡Listo para sumar! O sigue añadiendo números.");
+        }
+    }
+    
+    function resetCalculator() {
+        numbersToSum = [];
+        editingIndex = null; // Resetear el estado de edición
+        setUIMode('input');
+        renderOperands();
+        setExplanation('Añade al menos dos números para empezar.');
+    }
+
     function setUIMode(mode) {
-        // ... (sin cambios en esta función)
         if (mode === 'input') {
             inputContainer.classList.remove('hidden');
             calculateBtn.classList.remove('hidden');
@@ -111,27 +160,14 @@ document.addEventListener('DOMContentLoaded', () => {
             svg.classList.remove('hidden');
         }
     }
-
-    function resetCalculator() {
-        numbersToSum = [];
-        // calculationHistory = []; // Opcional: si quieres borrar el historial al empezar de nuevo
-        setUIMode('input');
-        renderOperands();
-        setExplanation('Añade al menos dos números para empezar.');
-    }
-
-    // --- 5. LÓGICA DEL CÁLCULO ---
-    // --- INICIO DE LA CORRECCIÓN 2 ---
+    
+    // --- 5. LÓGICA DEL CÁLCULO (Sin cambios significativos) ---
     async function startCalculation(replayData = null) {
         setUIMode('calculating');
-        
         let calculationData;
-
         if (replayData) {
-            // Es una repetición de un cálculo existente
             calculationData = replayData;
         } else {
-            // Es un cálculo nuevo
             let maxIntLength = 0, maxFracLength = 0;
             numbersToSum.forEach(num => {
                 const [intPart, fracPart = ''] = num.split('.');
@@ -142,53 +178,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 let [intPart, fracPart = ''] = num.split('.');
                 return intPart.padStart(maxIntLength, '0') + fracPart.padEnd(maxFracLength, '0');
             });
-            
-            calculationData = { 
-                paddedNumbers, 
-                decimalPosition: maxFracLength, 
-                originalNumbers: [...numbersToSum] 
-            };
-            
-            // Solo añadimos al historial si es un cálculo nuevo
+            calculationData = { paddedNumbers, decimalPosition: maxFracLength, originalNumbers: [...numbersToSum] };
             addToHistory(calculationData);
         }
-        
         const { paddedNumbers, decimalPosition, originalNumbers } = calculationData;
         const resultString = await animateMultiSum(paddedNumbers, decimalPosition);
-        
         let finalResultString = resultString;
         if (decimalPosition > 0) {
             const integerPart = resultString.slice(0, -decimalPosition) || '0';
             finalResultString = integerPart + '.' + resultString.slice(-decimalPosition);
         }
-        
         setUIMode('result');
         setExplanation(`¡Suma completada! El resultado final es ${finalResultString.replace('.', ',')}.`);
     }
 
     function addToHistory(calcData) {
         historySection.classList.remove('hidden');
-        
-        const index = calculationHistory.length; // Índice antes de añadir
-        calculationHistory.push(calcData); // Guardar los datos del cálculo
-
+        const index = calculationHistory.length;
+        calculationHistory.push(calcData);
         const li = document.createElement('li');
-        li.dataset.index = index; // Asociar el <li> con su data en el array
-        
-        let finalResultString = calcData.paddedNumbers.reduce((sum, num) => sum + parseInt(num, 10), 0).toString();
-        // Lógica simple para formatear el resultado para el texto del historial
+        li.dataset.index = index;
+        let result = BigInt(0);
+        calcData.originalNumbers.forEach(numStr => {
+            const [intPart = '0', fracPart = ''] = numStr.split('.');
+            const combined = intPart + fracPart.padEnd(calcData.decimalPosition, '0');
+            result += BigInt(combined);
+        });
+        let resultString = result.toString().padStart(calcData.decimalPosition + 1, '0');
         if (calcData.decimalPosition > 0) {
-             finalResultString = finalResultString.padStart(calcData.decimalPosition + 1, '0');
-             finalResultString = finalResultString.slice(0, -calcData.decimalPosition) + ',' + finalResultString.slice(-calcData.decimalPosition);
+            resultString = resultString.slice(0, -calcData.decimalPosition) + ',' + resultString.slice(-calcData.decimalPosition);
         }
-
-        li.textContent = calcData.originalNumbers.join(' + ').replace(/\./g, ',') + ` = ${finalResultString}`;
+        li.textContent = calcData.originalNumbers.join(' + ').replace(/\./g, ',') + ` = ${resultString}`;
         historyList.prepend(li);
     }
-    // --- FIN DE LA CORRECCIÓN 2 ---
     
     async function animateMultiSum(paddedNumbers, decimalPos) {
-        // ... (sin cambios en esta función)
+        // ... (sin cambios)
         const numDigits = paddedNumbers[0].length;
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
         svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} ${requiredHeight}`);
@@ -198,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     async function performMultiLineStepByStep(paddedNumbers, decimalPos) {
-        // ... (sin cambios en esta función)
+        // ... (sin cambios)
         let carry = 0;
         let resultString = '';
         const numDigits = paddedNumbers[0].length;
@@ -246,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupMultiLineSVG(paddedNumbers, decimalPos) {
-        // ... (sin cambios en esta función)
+        // ... (sin cambios)
         const numDigits = paddedNumbers[0].length;
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
         svg.appendChild(createSvgElement('rect', { id: 'highlight-rect', x: -1000, y: 0, width: COLUMN_WIDTH, height: requiredHeight, class: 'highlight-rect' }));

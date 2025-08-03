@@ -80,6 +80,38 @@ header h1 {
     content: '';
 }
 
+/* --- INICIO DE LA CORRECCIÓN DE ESTILOS --- */
+.operand-text {
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.operand-text:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.edit-input {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--result-dark);
+    text-align: right;
+    border: 2px solid var(--primary-purple);
+    outline: none;
+    background-color: #f3e5f54d;
+    border-radius: 8px;
+    padding: 0 6px;
+    /* Flex grow para que ocupe el espacio disponible */
+    flex-grow: 1;
+    width: 10px; /* Hack para que flex-grow funcione bien */
+}
+/* --- FIN DE LA CORRECCIÓN DE ESTILOS --- */
+
+
 .delete-btn {
     background: #ffebee;
     color: #f44336;
@@ -140,22 +172,19 @@ header h1 {
 #history-section { margin-top: 2rem; text-align: left; }
 #history-section h2 { font-size: 1.2rem; color: var(--text-light); }
 #history-list { list-style: none; padding: 0; margin: 0; }
-
-/* --- INICIO DE LA CORRECCIÓN --- */
 #history-list li { 
     background: #f1f3f5; 
     padding: 0.5rem 1rem; 
     border-radius: 5px; 
     margin-bottom: 0.5rem;
-    cursor: pointer; /* Indicar que es clicable */
-    transition: background-color 0.2s ease; /* Transición suave */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
     border: 1px solid transparent;
 }
 #history-list li:hover {
-    background-color: #e3e8f0; /* Color al pasar el ratón */
+    background-color: #e3e8f0;
     border-color: var(--primary-purple);
 }
-/* --- FIN DE LA CORRECCIÓN --- */
 
 /* UTILIDADES Y ANIMACIONES */
 .hidden { display: none !important; }
@@ -174,6 +203,7 @@ header h1 {
     .container { padding: 1.5rem 1rem; }
     header h1 { font-size: 1.8rem; }
     #whiteboard { min-height: 180px; font-size: 1.8rem; padding: 15px; }
+    .edit-input { font-size: 1.8rem; } /* <-- CORRECCIÓN RESPONSIVA */
     .digit { font-size: 28px; }
     .carry-text { font-size: 18px; }
     .plus-sign-svg { font-size: 28px; }
