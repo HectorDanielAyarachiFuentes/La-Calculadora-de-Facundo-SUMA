@@ -10,47 +10,53 @@
 <body>
 
     <main class="container">
+        <!-- Header is now a direct child of the container, outside the layout wrapper -->
         <header>
-            <h1>🧮 Calculadora Facundo+</h1>
+            <h1>🧮  La Calculadora de Facundo+</h1>
             <p class="subtitle">Una experiencia de suma visual e interactiva.</p>
         </header>
 
-        <!-- Área de Pizarra Digital -->
-        <div id="whiteboard">
-            <div id="operands-container"></div>
-            <svg id="calculation-svg" class="hidden"></svg>
-        </div>
-
-        <!-- Contenedor de entrada -->
-        <div id="input-container">
-            <div class="input-section">
-                <input type="text" id="numberInput" placeholder="Ingresa un número..." aria-label="Número para sumar">
-                <button id="addBtn" class="btn-add">Añadir</button>
+        <!-- Renamed to reflect its role as a layout wrapper -->
+        <div class="calculator-layout-wrapper">
+            
+            <!-- Column 1: Procedure (Left on Desktop) -->
+            <aside id="procedure-section" class="hidden">
+                <h2>Procedimiento</h2>
+                <ol id="procedure-list"></ol>
+            </aside>
+            
+            <!-- Column 2: Main Calculator (Center on Desktop) -->
+            <div class="main-content">
+                <div id="whiteboard">
+                    <div id="operands-container"></div>
+                    <svg id="calculation-svg" class="hidden"></svg>
+                </div>
+        
+                <div id="input-container">
+                    <div class="input-section">
+                        <input type="text" id="numberInput" placeholder="Ingresa un número..." aria-label="Número para sumar">
+                        <button id="addBtn" class="btn-add">Añadir</button>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="calculateBtn" class="btn-calculate" disabled>¡A Sumar!</button>
+                    <button id="replayBtn" class="btn-replay hidden">Repetir Animación</button>
+                    <button id="resetBtn" class="btn-reset">Nueva Suma</button>
+                </div>
+                
+                <div id="explanation-box">
+                    <p id="explanation-text">Añade al menos dos números para empezar.</p>
+                </div>
             </div>
-        </div>
-        
-        <!-- Controles Principales -->
-        <div class="controls">
-            <button id="calculateBtn" class="btn-calculate" disabled>¡A Sumar!</button>
-            <button id="replayBtn" class="btn-replay hidden">Repetir Animación</button>
-            <button id="resetBtn" class="btn-reset">Nueva Suma</button>
-        </div>
-        
-        <div id="explanation-box">
-            <p id="explanation-text">Añade al menos dos números para empezar.</p>
-        </div>
 
-        <!-- INICIO DE LA CORRECCIÓN: Nueva sección de procedimiento -->
-        <aside id="procedure-section" class="hidden">
-            <h2>Procedimiento</h2>
-            <ol id="procedure-list"></ol>
-        </aside>
-        <!-- FIN DE LA CORRECCIÓN -->
+            <!-- Column 3: History (Right on Desktop) -->
+            <aside id="history-section" class="hidden">
+                <h2>Historial de Sumas</h2>
+                <ul id="history-list"></ul>
+            </aside>
 
-        <aside id="history-section" class="hidden">
-            <h2>Historial de Sumas</h2>
-            <ul id="history-list"></ul>
-        </aside>
+        </div>
 
     </main>
 

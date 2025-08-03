@@ -28,15 +28,19 @@ body {
     box-shadow: var(--shadow);
     padding: 2rem;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px; /* Default max-width for mobile/tablet */
+    transition: max-width 0.4s ease-in-out;
+    /* Flexbox to correctly stack header and layout wrapper */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    width: 100%;
     text-align: center;
 }
 
-header h1 {
-    font-weight: 900;
-    font-size: 2.2rem;
-    color: var(--primary-purple);
-}
 .subtitle { margin: 0.2rem 0 1.5rem; color: var(--text-light); }
 
 #whiteboard {
@@ -152,7 +156,6 @@ header h1 {
 .btn-replay { background-color: var(--primary-purple); color: white; }
 .btn-reset { background-color: var(--text-light); color: white; }
 
-/* EXPLICACIÓN E HISTORIAL */
 #explanation-box {
     background-color: #f3e5f5;
     border-left: 5px solid var(--primary-purple);
@@ -214,9 +217,56 @@ header h1 {
 .sum-line-svg { stroke: var(--result-dark); stroke-width: 2.5; }
 .highlight-rect { fill: #fff176; opacity: 0.5; transition: all 0.5s ease-in-out; }
 
+
+/* --- LAYOUT STYLES --- */
+.calculator-layout-wrapper {
+    display: flex;
+    flex-direction: column; /* Mobile-first: stacks columns */
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+/* On mobile, reorder for better flow: main content is first */
+.main-content { order: 1; }
+#procedure-section { order: 2; }
+#history-section { order: 3; }
+
+
+/* DESKTOP: 3-Column Flexbox Layout */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px; /* Widen container for desktop */
+    }
+
+    .calculator-layout-wrapper {
+        flex-direction: row; /* Switch to side-by-side columns */
+        align-items: flex-start;
+        gap: 3rem; /* Increased gap for better visual separation */
+    }
+    
+    /* Reset mobile ordering so columns appear as defined in the HTML */
+    .main-content, #procedure-section, #history-section {
+        order: 0;
+        margin-top: 0;
+    }
+
+    /* Define column sizes */
+    #procedure-section {
+        flex: 1 1 25%; /* Left column */
+    }
+    .main-content {
+        flex: 1 1 50%; /* Center column (wider) */
+    }
+    #history-section {
+        flex: 1 1 25%; /* Right column */
+    }
+}
+
+
+/* RESPONSIVE STYLES FOR SMALLER SCREENS */
 @media (max-width: 576px) {
     body { padding: 1rem 0.5rem; }
-    .container { padding: 1.5rem 1rem; }
+    .container { padding: 1.5rem 1rem; max-width: 100%; }
     header h1 { font-size: 1.8rem; }
     #whiteboard { min-height: 180px; font-size: 1.8rem; padding: 15px; }
     .edit-input { font-size: 1.8rem; }
