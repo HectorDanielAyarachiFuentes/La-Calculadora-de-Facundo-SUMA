@@ -362,11 +362,8 @@ document.addEventListener('DOMContentLoaded', () => {
         "El secreto para salir adelante es empezar. ¡Y tú ya empezaste!"
     ];
     const adultMotivations = [
-        "Gracias por enseñar con paciencia. Estás construyendo la confianza de un niño, un número a la vez.",
-        "Recuerda que el objetivo no es la respuesta correcta, sino el proceso de aprender y descubrir juntos.",
-        "Tu apoyo y ánimo son las herramientas más importantes en este viaje de aprendizaje.",
-        "Celebrar los pequeños logros crea grandes aprendices. ¡Sigue así!",
-        "Enseñar es dejar una huella en el futuro. Gracias por tu dedicación."
+        "NO ME RETES VIEJA CHOTA, NA MENTIRA XD!.",
+       
     ];
 
     function leerEnVoz(texto) {
