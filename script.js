@@ -23,21 +23,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 3. MANEJADORES DE EVENTOS ---
     addBtn.addEventListener('click', addNumber);
     numberInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addNumber(); } });
+
+    // --- INICIO DE LA CORRECCIÓN 1: Filtro en tiempo real ---
+    numberInput.addEventListener('input', () => {
+        // Permite solo números, comas y puntos, eliminando cualquier otro caracter al instante.
+        numberInput.value = numberInput.value.replace(/[^0-9,.]/g, '');
+    });
+    // --- FIN DE LA CORRECCIÓN 1 ---
+
     calculateBtn.addEventListener('click', () => startCalculation(false));
     replayBtn.addEventListener('click', () => startCalculation(true));
     resetBtn.addEventListener('click', resetCalculator);
     operandsContainer.addEventListener('click', (e) => { if (e.target.classList.contains('delete-btn')) handleDeleteNumber(e); });
 
     // --- 4. LÓGICA DE LA INTERFAZ ---
+
+    // --- INICIO DE LA CORRECCIÓN 2: Validación reforzada ---
     function addNumber() {
-        let value = numberInput.value.trim().replace(',', '.');
-        if (value && !isNaN(parseFloat(value)) && isFinite(value)) {
+        // Reemplaza la coma con un punto para un procesamiento consistente.
+        const value = numberInput.value.trim().replace(',', '.');
+
+        // La validación final y más estricta.
+        // isFinite(Number(value)) comprueba si el string es un número válido y finito.
+        // Rechazará strings como "1.2.3", "...", un string vacío, o solo ".".
+        if (value && isFinite(Number(value))) {
             numbersToSum.push(value);
             renderOperands();
             numberInput.value = '';
             numberInput.focus();
-        } else { setExplanation("Por favor, ingresa un número válido."); }
+        } else { 
+            setExplanation(`"${numberInput.value}" no es un número válido. Inténtalo de nuevo.`);
+            numberInput.focus();
+            numberInput.select(); // Selecciona el texto erróneo para facilitar la corrección.
+        }
     }
+    // --- FIN DE LA CORRECCIÓN 2 ---
 
     function renderOperands() {
         operandsContainer.innerHTML = '';
@@ -143,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let resultString = '';
         const numDigits = paddedNumbers[0].length;
         const resultY = Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT;
+        let allCarries = [];
 
         if (decimalPos > 0) {
             const decimalX = END_X - ((decimalPos - 1) * COLUMN_WIDTH) + COLUMN_WIDTH / 2;
@@ -161,10 +182,14 @@ document.addEventListener('DOMContentLoaded', () => {
             resultString = digitForColumn + resultString;
             setExplanation(`Columna: ...${columnSum}. Se escribe ${digitForColumn}, se lleva ${carry}.`);
             svg.appendChild(createSvgElement('text', { x, y: resultY, class: 'digit result-text' }, digitForColumn));
+            
             const prevCarry = svg.querySelector('.carry-text');
             if (prevCarry) prevCarry.remove();
+
             if (carry > 0) {
-                svg.appendChild(createSvgElement('text', { x: x - COLUMN_WIDTH, y: Y_CARRY, class: 'digit carry-text' }, carry));
+                const carryX = x - COLUMN_WIDTH;
+                allCarries.push({ value: carry, x: carryX });
+                svg.appendChild(createSvgElement('text', { x: carryX, y: Y_CARRY, class: 'digit carry-text' }, carry));
             }
             await sleep(1500);
         }
@@ -181,6 +206,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const finalFloatingCarry = svg.querySelector('.carry-text');
         if (finalFloatingCarry) finalFloatingCarry.remove();
 
+        allCarries.forEach(c => {
+            svg.appendChild(createSvgElement('text', { x: c.x, y: Y_CARRY, class: 'digit carry-text' }, c.value));
+        });
+
         return resultString;
     }
 
@@ -189,14 +218,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
         svg.appendChild(createSvgElement('rect', { id: 'highlight-rect', x: -1000, y: 0, width: COLUMN_WIDTH, height: requiredHeight, class: 'highlight-rect' }));
         
-        // --- INICIO DE LA CORRECCIÓN ---
-        // Dibuja el signo de suma si hay más de un número
         if (paddedNumbers.length > 1) {
             const plusX = END_X - (numDigits * COLUMN_WIDTH) - (COLUMN_WIDTH * 0.5);
             const plusY = Y_START + ((paddedNumbers.length - 1) * ROW_HEIGHT);
             svg.appendChild(createSvgElement('text', { x: plusX, y: plusY, class: 'digit plus-sign-svg' }, '+'));
         }
-        // --- FIN DE LA CORRECCIÓN ---
 
         paddedNumbers.forEach((numStr, rowIndex) => {
             const y = Y_START + (rowIndex * ROW_HEIGHT);
