@@ -206,7 +206,14 @@ document.addEventListener('DOMContentLoaded', () => {
         let carry = 0, resultString = '', allCarries = [];
         const numDigits = paddedNumbers[0].length;
         const resultY = Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT;
-        if (decimalPos > 0) svg.appendChild(createSvgElement('text', { x: END_X - ((decimalPos) * COLUMN_WIDTH) + COLUMN_WIDTH / 2, y: resultY, class: 'decimal-point' }, '.'));
+        if (decimalPos > 0) {
+            // Corregimos la posición del punto decimal en el resultado
+            svg.appendChild(createSvgElement('text', { 
+                x: END_X - ((decimalPos) * COLUMN_WIDTH) + COLUMN_WIDTH / 2, 
+                y: resultY, 
+                class: 'decimal-point' 
+            }, '.'));
+        }
 
         for (let i = 0; i < numDigits; i++) {
             const digitIndex = numDigits - 1 - i, x = END_X - (i * COLUMN_WIDTH);
@@ -266,8 +273,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const numDigits = paddedNumbers[0].length;
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
         svg.appendChild(createSvgElement('rect', { id: 'highlight-rect', x: -1000, y: 0, width: COLUMN_WIDTH, height: requiredHeight, class: 'highlight-rect' }));
-        if (paddedNumbers.length > 1) { const plusX = END_X - (numDigits * COLUMN_WIDTH) - (COLUMN_WIDTH * 0.5); const plusY = Y_START + ((paddedNumbers.length - 1) * ROW_HEIGHT); svg.appendChild(createSvgElement('text', { x: plusX, y: plusY, class: 'digit plus-sign-svg' }, '+')); }
-        paddedNumbers.forEach((numStr, rowIndex) => { const y = Y_START + (rowIndex * ROW_HEIGHT); const colorClass = (rowIndex % 2 === 0) ? 'num1-text' : 'num2-text'; for (let i = 0; i < numDigits; i++) { const x = END_X - (i * COLUMN_WIDTH); if (decimalPos > 0 && i === decimalPos) { svg.appendChild(createSvgElement('text', { x: x + COLUMN_WIDTH / 2, y: y, class: 'decimal-point' }, '.')); } svg.appendChild(createSvgElement('text', { x, y, class: `digit ${colorClass}` }, numStr[numDigits - 1 - i])); } });
+        if (paddedNumbers.length > 1) { 
+            const plusX = END_X - (numDigits * COLUMN_WIDTH) - (COLUMN_WIDTH * 0.5); 
+            const plusY = Y_START + ((paddedNumbers.length - 1) * ROW_HEIGHT); 
+            svg.appendChild(createSvgElement('text', { x: plusX, y: plusY, class: 'digit plus-sign-svg' }, '+')); 
+        }
+        paddedNumbers.forEach((numStr, rowIndex) => { 
+            const y = Y_START + (rowIndex * ROW_HEIGHT); 
+            const colorClass = (rowIndex % 2 === 0) ? 'num1-text' : 'num2-text'; 
+            for (let i = 0; i < numDigits; i++) { 
+                const x = END_X - (i * COLUMN_WIDTH); 
+                // Colocamos el punto decimal en la posición correcta
+                if (decimalPos > 0 && i === decimalPos) { 
+                    svg.appendChild(createSvgElement('text', { x: x + COLUMN_WIDTH / 2, y: y, class: 'decimal-point' }, '.')); 
+                } 
+                svg.appendChild(createSvgElement('text', { x, y, class: `digit ${colorClass}` }, numStr[numDigits - 1 - i])); 
+            } 
+        });
         const lineY = Y_START + (paddedNumbers.length * ROW_HEIGHT) - (ROW_HEIGHT / 2);
         svg.appendChild(createSvgElement('line', { x1: END_X - (numDigits * COLUMN_WIDTH) - COLUMN_WIDTH * 1.5, y1: lineY, x2: END_X + COLUMN_WIDTH / 2, y2: lineY, class: 'sum-line-svg' }));
     }
