@@ -10,6 +10,10 @@
     --pill-bg: #e9ecef;
     --font-family: 'Nunito', sans-serif;
     --shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --container-bg: rgba(255, 255, 255, 0.95);
+    --primary-gradient: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+    --hover-effect: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 body {
@@ -181,7 +185,99 @@ header h1 {
 
 
 
-/* ... (todo el CSS anterior es igual) ... */
+body {
+    background-image: var(--bg-gradient);
+    padding: 2rem 1rem;
+}
+
+.container {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: var(--primary-gradient);
+    opacity: 0.05;
+    z-index: -1;
+}
+
+.btn-add, .btn-calculate {
+    background-image: var(--primary-gradient);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.btn-add:hover, .btn-calculate:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--hover-effect);
+}
+
+#calculation-area {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(106, 90, 205, 0.1);
+}
+
+#numberInput {
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+#numberInput:focus {
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+#number-list-container {
+    text-align: left;
+    margin-bottom: 2rem;
+    min-height: 60px;
+}
+#number-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+#number-list li {
+    background-color: var(--pill-bg);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    animation: pop-in 0.3s ease-out;
+}
+
+.controls {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn-calculate, .btn-reset {
+    padding: 0.9rem 1.8rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-calculate { background-color: var(--primary-green); color: white; }
+.btn-calculate:hover { background-color: #218838; transform: translateY(-2px); }
+.btn-calculate:disabled { background-color: #94d3a2; cursor: not-allowed; transform: none; }
+
+.btn-reset { background-color: var(--text-light); color: white; }
+.btn-reset:hover { background-color: #5a6268; }
 
 #calculation-area {
     background: #fdfdff;
@@ -196,6 +292,42 @@ header h1 {
 }
 
 #calculation-svg { width: 100%; height: auto; } /* Altura automática para adaptarse al viewBox */
+.digit { font-size: 32px; font-weight: 700; text-anchor: middle; }
+.num1-text { fill: var(--primary-blue); }
+.num2-text { fill: var(--primary-green); }
+.carry-text { fill: var(--carry-orange); font-size: 20px; font-weight: 900; animation: fadeIn 0.5s ease; }
+.result-text { fill: var(--result-dark); font-weight: 900; }
+.decimal-point { font-size: 32px; font-weight: 900; fill: var(--result-dark); text-anchor: middle; }
+.sum-line { stroke: var(--result-dark); stroke-width: 2.5; border-radius: 2px; }
+/* Estilo para el signo de suma en el SVG */
+.plus-sign-svg { fill: var(--text-light); font-weight: 700; }
 
-/* ... (el resto del CSS es igual) ... */
+#explanation-box {
+    background: #e9f5ff;
+    border-left: 5px solid var(--primary-blue);
+    padding: 1rem;
+    border-radius: 8px;
+    min-height: 50px;
+    text-align: left;
+    margin-bottom: 2rem;
+    transition: background-color 0.3s;
+}
+#explanation-text { margin: 0; font-size: 1.1rem; color: #004085; transition: opacity 0.5s; }
+
+#history-section { border-top: 1px solid var(--line-color); padding-top: 1.5rem; }
+#history-section h2 { margin-top: 0; margin-bottom: 0.5rem; }
+#history-list { list-style: none; padding: 0; margin: 0; font-size: 1.1rem; color: var(--text-light); }
+#history-list li { padding: 0.3rem 0; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop-in {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+@keyframes carry-fly {
+    from { transform: translateY(20px) scale(0.5); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+.carry-animation { animation: carry-fly 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.highlight-rect { fill: #ffdd00; opacity: 0.4; transition: all 0.5s ease-in-out; }
 
