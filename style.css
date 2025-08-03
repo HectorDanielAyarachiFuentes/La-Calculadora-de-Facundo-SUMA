@@ -186,6 +186,21 @@ header {
     border: 1px solid #e9ecef;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    position: relative;
+}
+
+#procedure-list li::after {
+    content: '🔊';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    font-size: 1.2rem;
+}
+
+#procedure-list li:hover::after {
+    opacity: 1;
 }
 #procedure-list li:hover {
     background-color: #f3e5f5;
