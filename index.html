@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Calculadora Avanzada de Facundo</title>
+    <title>Calculadora Facundo+</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
@@ -12,40 +12,40 @@
     <main class="container">
         <header>
             <h1>🧮 Calculadora Facundo+</h1>
-            <p class="subtitle">Suma varios números, ¡con decimales y llevadas!</p>
+            <p class="subtitle">Una experiencia de suma visual e interactiva.</p>
         </header>
 
-        <div class="input-section">
-            <input type="text" id="numberInput" placeholder="Ingresa un número" aria-label="Número para sumar">
-            <button id="addBtn" class="btn-add">Añadir a la suma</button>
+        <!-- Área de Pizarra Digital -->
+        <div id="whiteboard">
+            <div id="operands-container">
+                <!-- Los números para sumar se renderizarán aquí -->
+            </div>
+            <!-- El SVG ahora se usará para la animación Y para mostrar el resultado final -->
+            <svg id="calculation-svg" class="hidden"></svg>
         </div>
 
-        <div id="number-list-container">
-            <h3>Números para sumar:</h3>
-            <ul id="number-list">
-                <!-- Los números añadidos aparecerán aquí -->
-            </ul>
+        <!-- Contenedor de entrada (se ocultará después del cálculo) -->
+        <div id="input-container">
+            <div class="input-section">
+                <input type="text" id="numberInput" placeholder="Ingresa un número..." aria-label="Número para sumar">
+                <button id="addBtn" class="btn-add">Añadir</button>
+            </div>
         </div>
         
+        <!-- Controles Principales -->
         <div class="controls">
             <button id="calculateBtn" class="btn-calculate" disabled>¡A Sumar!</button>
-            <button id="resetBtn" class="btn-reset">Empezar de Nuevo</button>
+            <button id="replayBtn" class="btn-replay hidden">Repetir Animación</button>
+            <button id="resetBtn" class="btn-reset">Nueva Suma</button>
         </div>
-
-        <div id="calculation-area">
-            <svg id="calculation-svg" viewBox="0 0 500 200"></svg>
-        </div>
-
+        
         <div id="explanation-box">
             <p id="explanation-text">Añade al menos dos números para empezar.</p>
         </div>
 
-        <button id="replayBtn" class="btn-replay" hidden>Repetir Animación</button>
-
-        <aside id="history-section">
-            <h2>Historial</h2>
-            <ul id="history-list">
-            </ul>
+        <aside id="history-section" class="hidden">
+            <h2>Historial de Sumas</h2>
+            <ul id="history-list"></ul>
         </aside>
 
     </main>
