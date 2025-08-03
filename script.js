@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setUIMode(mode) {
-        // Modo inicial o después de resetear
         if (mode === 'input') {
             inputContainer.classList.remove('hidden');
             calculateBtn.classList.remove('hidden');
@@ -71,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
             svg.innerHTML = '';
             calculateBtn.disabled = numbersToSum.length < 2;
         } 
-        // Durante la animación
         else if (mode === 'calculating') {
             inputContainer.classList.add('hidden');
             calculateBtn.classList.add('hidden');
@@ -79,12 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
             operandsContainer.classList.add('hidden');
             svg.classList.remove('hidden');
         }
-        // Después de que la animación termina
         else if (mode === 'result') {
             inputContainer.classList.add('hidden');
             calculateBtn.classList.add('hidden');
             replayBtn.classList.remove('hidden');
-            // La clave: el SVG permanece visible
             svg.classList.remove('hidden');
         }
     }
@@ -125,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
             finalResultString = integerPart + '.' + resultString.slice(-decimalPosition);
         }
         
-        // La animación ha terminado, cambiamos al modo resultado
         setUIMode('result');
         setExplanation(`¡Suma completada! El resultado final es ${finalResultString.replace('.', ',')}.`);
         
@@ -138,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const numDigits = paddedNumbers[0].length;
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
         svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} ${requiredHeight}`);
-        svg.innerHTML = ''; // Limpiar SVG para repeticiones
+        svg.innerHTML = ''; 
         setupMultiLineSVG(paddedNumbers, decimalPos);
         return await performMultiLineStepByStep(paddedNumbers, decimalPos);
     }
@@ -182,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
             resultString = carry + resultString;
         }
         
-        // Limpieza final para una vista perfecta
         document.getElementById('highlight-rect').setAttribute('x', -1000);
         const finalFloatingCarry = svg.querySelector('.carry-text');
         if (finalFloatingCarry) finalFloatingCarry.remove();
@@ -194,6 +188,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const numDigits = paddedNumbers[0].length;
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
         svg.appendChild(createSvgElement('rect', { id: 'highlight-rect', x: -1000, y: 0, width: COLUMN_WIDTH, height: requiredHeight, class: 'highlight-rect' }));
+        
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Dibuja el signo de suma si hay más de un número
+        if (paddedNumbers.length > 1) {
+            const plusX = END_X - (numDigits * COLUMN_WIDTH) - (COLUMN_WIDTH * 0.5);
+            const plusY = Y_START + ((paddedNumbers.length - 1) * ROW_HEIGHT);
+            svg.appendChild(createSvgElement('text', { x: plusX, y: plusY, class: 'digit plus-sign-svg' }, '+'));
+        }
+        // --- FIN DE LA CORRECCIÓN ---
+
         paddedNumbers.forEach((numStr, rowIndex) => {
             const y = Y_START + (rowIndex * ROW_HEIGHT);
             const colorClass = (rowIndex % 2 === 0) ? 'num1-text' : 'num2-text';
@@ -205,8 +209,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 svg.appendChild(createSvgElement('text', { x, y, class: `digit ${colorClass}` }, numStr[numDigits - 1 - i]));
             }
         });
+
         const lineY = Y_START + (paddedNumbers.length * ROW_HEIGHT) - (ROW_HEIGHT / 2);
-        svg.appendChild(createSvgElement('line', { x1: END_X - (numDigits * COLUMN_WIDTH) - COLUMN_WIDTH, y1: lineY, x2: END_X + COLUMN_WIDTH / 2, y2: lineY, class: 'sum-line-svg' }));
+        svg.appendChild(createSvgElement('line', { x1: END_X - (numDigits * COLUMN_WIDTH) - COLUMN_WIDTH * 1.5, y1: lineY, x2: END_X + COLUMN_WIDTH / 2, y2: lineY, class: 'sum-line-svg' }));
     }
 
     // --- 6. FUNCIONES AUXILIARES ---
