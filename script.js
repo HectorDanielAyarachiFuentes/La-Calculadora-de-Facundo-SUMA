@@ -21,14 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let calculationHistory = [];
     let editingIndex = null;
     let procedureSteps = [];
+    let currentCalculationData = null; // *** NUEVO: Para saber qué cálculo se está mostrando
 
-    // --- CONSTANTES SVG ---
+    // --- CONSTANTES ---
     const SVG_WIDTH = 460;
     const COLUMN_WIDTH = 35;
     const END_X = SVG_WIDTH - 40;
     const Y_START = 50;
     const ROW_HEIGHT = 45;
     const Y_CARRY = 25;
+    const HISTORY_STORAGE_KEY = 'facundoCalcHistory';
 
     // --- 3. MANEJADORES DE EVENTOS ---
     addBtn.addEventListener('click', addNumber);
@@ -36,8 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
     numberInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addNumber(); } });
     calculateBtn.addEventListener('click', () => startCalculation());
     resetBtn.addEventListener('click', resetCalculator);
-    replayBtn.addEventListener('click', () => { if (calculationHistory.length > 0) startCalculation(calculationHistory[calculationHistory.length - 1]); });
-    historyList.addEventListener('click', (e) => { const li = e.target.closest('li'); if (li && li.dataset.index) startCalculation(calculationHistory[parseInt(li.dataset.index, 10)]); });
+    // *** MODIFICADO: ReplayBtn ahora usa el cálculo actual ***
+    replayBtn.addEventListener('click', () => { if (currentCalculationData) startCalculation(currentCalculationData); });
+    // *** MODIFICADO: El clic en el historial ahora muestra el resultado al instante ***
+    historyList.addEventListener('click', (e) => { 
+        const li = e.target.closest('li'); 
+        if (li && li.dataset.index) {
+            const index = parseInt(li.dataset.index, 10);
+            showStaticResult(calculationHistory[index]);
+        }
+    });
     operandsContainer.addEventListener('click', (e) => {
         if (calculateBtn.disabled && editingIndex === null) return;
         if (e.target.classList.contains('delete-btn')) handleDeleteNumber(e.target.dataset.index);
@@ -140,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetCalculator() {
         numbersToSum = [];
         editingIndex = null;
+        currentCalculationData = null; // Limpiar el cálculo actual
         setUIMode('input');
         renderOperands();
         setExplanation('Añade al menos dos números para empezar.');
@@ -148,7 +159,34 @@ document.addEventListener('DOMContentLoaded', () => {
         svg.innerHTML = '';
     }
 
-    // --- 5. LÓGICA DEL CÁLCULO ---
+    // --- 5. LÓGICA DEL CÁLCULO Y MANEJO DEL HISTORIAL ---
+    function saveHistoryToLocalStorage() {
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(calculationHistory));
+    }
+
+    function loadHistoryFromLocalStorage() {
+        const savedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
+        if (savedHistory) {
+            calculationHistory = JSON.parse(savedHistory);
+            renderHistory();
+        }
+    }
+    
+    function renderHistory() {
+        historyList.innerHTML = '';
+        if (calculationHistory.length > 0) {
+            historySection.classList.remove('hidden');
+            calculationHistory.forEach((calcData, index) => {
+                const li = document.createElement('li');
+                li.dataset.index = index;
+                li.textContent = calcData.originalNumbers.join(' + ').replace(/\./g, ',') + ` = ${calcData.resultString.replace('.', ',')}`;
+                historyList.appendChild(li);
+            });
+        } else {
+            historySection.classList.add('hidden');
+        }
+    }
+
     async function startCalculation(replayData = null) {
         setUIMode('calculating');
         procedureSection.classList.add('hidden');
@@ -176,20 +214,17 @@ document.addEventListener('DOMContentLoaded', () => {
             calculationData = { paddedNumbers, decimalPosition: maxFracLength, originalNumbers: [...numbersToSum] };
             addToHistory(calculationData);
         }
-
+        
+        currentCalculationData = calculationData; // Guardar el cálculo actual
         const { paddedNumbers, decimalPosition } = calculationData;
         await animateMultiSum(paddedNumbers, decimalPosition);
-
-        const completedCalc = calculationHistory.find(c => c.originalNumbers.join() === calculationData.originalNumbers.join());
-        const finalResultString = completedCalc ? completedCalc.resultString : "Error";
 
         setUIMode('result');
         renderProcedure();
         setupVoiceReader();
     }
-
+    
     function addToHistory(calcData) {
-        historySection.classList.remove('hidden');
         let result = BigInt(0);
         calcData.paddedNumbers.forEach(numStr => { result += BigInt(numStr); });
         let resultString = result.toString().padStart(calcData.decimalPosition + 1, '0');
@@ -199,11 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
             resultString = `${intPart}.${fracPart}`;
         }
         calcData.resultString = resultString;
-        calculationHistory.push(calcData);
-        const li = document.createElement('li');
-        li.dataset.index = calculationHistory.length - 1;
-        li.textContent = calcData.originalNumbers.join(' + ').replace(/\./g, ',') + ` = ${resultString.replace('.', ',')}`;
-        historyList.prepend(li);
+        
+        calculationHistory.unshift(calcData);
+        saveHistoryToLocalStorage();
+        renderHistory();
     }
 
     async function animateMultiSum(paddedNumbers, decimalPos) {
@@ -214,6 +248,75 @@ document.addEventListener('DOMContentLoaded', () => {
         setupMultiLineSVG(paddedNumbers, decimalPos);
         await performMultiLineStepByStep(paddedNumbers, decimalPos);
     }
+    
+    // *** NUEVA FUNCIÓN PARA MOSTRAR RESULTADO ESTÁTICO ***
+    function showStaticResult(calcData) {
+        currentCalculationData = calcData; // Guardar como cálculo actual para el botón de repetir
+        procedureSteps = []; // Reiniciar los pasos del procedimiento
+        setUIMode('result'); // Cambiar a la vista de resultado
+        svg.innerHTML = ''; // Limpiar el SVG
+        
+        const { paddedNumbers, decimalPosition, resultString } = calcData;
+        const numDigits = paddedNumbers[0].length;
+        const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
+        svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} ${requiredHeight}`);
+
+        // 1. Dibujar la suma base (números y línea)
+        setupMultiLineSVG(paddedNumbers, decimalPosition);
+
+        // 2. Calcular y dibujar el resultado y las llevadas instantáneamente
+        let carry = 0;
+        let allCarries = [];
+        let fullResultWithCarry = "";
+
+        // Calcular el resultado completo incluyendo la última llevada
+        let sumTotal = BigInt(0);
+        paddedNumbers.forEach(num => sumTotal += BigInt(num));
+        fullResultWithCarry = sumTotal.toString().padStart(numDigits + 1, '0');
+
+
+        // Iterar para encontrar las llevadas
+        for (let i = 0; i < numDigits; i++) {
+            const digitIndex = numDigits - 1 - i;
+            let columnSum = carry;
+            paddedNumbers.forEach(numStr => {
+                columnSum += parseInt(numStr[digitIndex]);
+            });
+            const newCarry = Math.floor(columnSum / 10);
+            
+            // Guardar en procedureSteps para la lectura de voz
+            const stepDigits = paddedNumbers.map(num => parseInt(num[digitIndex]));
+            procedureSteps.push({ digits: stepDigits, carryIn: carry, sum: columnSum, resultDigit: columnSum % 10, carryOut: newCarry, x: END_X - (i * COLUMN_WIDTH) });
+
+            carry = newCarry;
+            if (carry > 0) {
+                allCarries.push({ value: carry, x: END_X - ((i + 1) * COLUMN_WIDTH) });
+            }
+        }
+        
+        // 3. Dibujar el resultado completo
+        for (let i = 0; i < fullResultWithCarry.length; i++) {
+            const digit = fullResultWithCarry[fullResultWithCarry.length - 1 - i];
+            const x = END_X - (i * COLUMN_WIDTH);
+            svg.appendChild(createSvgElement('text', { x, y: Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT, class: 'digit result-text' }, digit));
+        }
+
+        // 4. Dibujar todas las llevadas
+        allCarries.forEach(c => svg.appendChild(createSvgElement('text', { x: c.x, y: Y_CARRY, class: 'digit carry-text' }, c.value)));
+
+        // 5. Dibujar el punto decimal si es necesario
+        if (decimalPosition > 0) {
+            const resultY = Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT;
+            const decimalXForResult = END_X - (decimalPosition * COLUMN_WIDTH) + COLUMN_WIDTH / 2;
+            svg.appendChild(createSvgElement('text', { x: decimalXForResult, y: resultY, class: 'decimal-point' }, '.'));
+        }
+
+        // 6. Actualizar UI
+        setExplanation(`Mostrando el resultado de la suma: ${resultString.replace('.', ',')}.`);
+        renderProcedure();
+        setupVoiceReader();
+    }
+
 
     async function performMultiLineStepByStep(paddedNumbers, decimalPos) {
         procedureSteps = [];
@@ -363,7 +466,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
     const adultMotivations = [
         "NO ME RETES VIEJA CHOTA, NA MENTIRA XD!.",
-       
+        "Gracias por enseñar con paciencia. Estás construyendo la confianza de un niño, un número a la vez.",
+        "Recuerda que el objetivo no es la respuesta correcta, sino el proceso de aprender y descubrir juntos.",
+        "Tu apoyo y ánimo son las herramientas más importantes en este viaje de aprendizaje.",
+        "Celebrar los pequeños logros crea grandes aprendices. ¡Sigue así!",
+        "Enseñar es dejar una huella en el futuro. Gracias por tu dedicación."
     ];
 
     function leerEnVoz(texto) {
@@ -458,5 +565,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- INICIALIZACIÓN ---
-    resetCalculator();
+    function init() {
+        loadHistoryFromLocalStorage();
+        resetCalculator();
+    }
+
+    init();
 });
