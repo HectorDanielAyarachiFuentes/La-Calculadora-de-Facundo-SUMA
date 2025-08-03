@@ -361,3 +361,120 @@ header {
         flex-direction: column;
     }
 }
+
+
+/* --- ESTILOS DEL FOOTER MOTIVACIONAL --- */
+.motivational-footer {
+    width: 100%;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
+    gap: 1rem;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+    color: var(--primary-purple);
+}
+
+.logo-svg {
+    width: 40px;
+    height: 40px;
+}
+
+.footer-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.footer-btn {
+    background-color: #f1f3f5;
+    color: var(--text-light);
+    border: 1px solid var(--line-color);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-family: var(--font-family);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.footer-btn:hover {
+    background-color: var(--primary-purple);
+    color: white;
+    border-color: var(--primary-purple);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Adaptar footer para móviles */
+@media (max-width: 600px) {
+    .motivational-footer {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    .footer-buttons {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+/* --- ESTILOS DE PROCEDIMIENTO Y HISTORIAL --- */
+#procedure-section, #history-section { 
+    margin-top: 1.5rem; 
+    text-align: left; 
+}
+
+/* --- ESTA ES LA SECCIÓN MODIFICADA PARA EL SCROLL --- */
+#procedure-section {
+    display: flex;
+    flex-direction: column;
+    /* Establecemos una altura máxima. El contenido no podrá superar este alto. */
+    /* Este valor funciona bien en la vista de escritorio de 3 columnas. */
+    max-height: 450px; 
+}
+
+#procedure-section h2, #history-section h2 { 
+    font-size: 1.2rem; 
+    color: var(--text-light); 
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    /* Hacemos que el título no se mueva con el scroll */
+    flex-shrink: 0;
+}
+
+#procedure-list, #history-list { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0; 
+}
+
+/* --- ESTA ES LA SEGUNDA PARTE CLAVE PARA EL SCROLL --- */
+#procedure-list {
+    /* Si el contenido de la lista supera el espacio disponible, muestra un scroll vertical */
+    overflow-y: auto; 
+    /* Pequeño padding para que el scroll no se pegue al borde */
+    padding-right: 0.5rem; 
+}
+
+#procedure-list li {
+    padding: 0.5rem 0.8rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+}
