@@ -5,18 +5,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const numberList = document.getElementById('number-list');
     const calculateBtn = document.getElementById('calculateBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const replayBtn = document.getElementById('replayBtn');
     const svg = document.getElementById('calculation-svg');
     const explanationText = document.getElementById('explanation-text');
     const historyList = document.getElementById('history-list');
 
     let numbersToSum = [];
+    let lastCalculationData = null;
 
     // --- CONSTANTES DE CONFIGURACIÓN DEL SVG ---
     const SVG_WIDTH = 500;
     const COLUMN_WIDTH = 30;
     const END_X = SVG_WIDTH - 40;
-    const Y_START = 50; // Posición Y del primer número
-    const ROW_HEIGHT = 40; // Espacio vertical entre números
+    const Y_START = 50;
+    const ROW_HEIGHT = 40;
     const Y_CARRY = 25;
 
     // --- 2. MANEJADORES DE EVENTOS ---
@@ -29,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     calculateBtn.addEventListener('click', startCalculation);
     resetBtn.addEventListener('click', resetCalculator);
+    replayBtn.addEventListener('click', handleReplay);
 
     // --- 3. FUNCIONES PRINCIPALES ---
     
@@ -64,22 +67,20 @@ document.addEventListener('DOMContentLoaded', () => {
         numberInput.disabled = false;
         addBtn.disabled = false;
         historyList.innerHTML = '';
-        svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} 200`); // Resetear viewBox
+        svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} 200`);
+        replayBtn.hidden = true;
+        lastCalculationData = null;
     }
 
     function startCalculation() {
         if (numbersToSum.length < 2) return;
-
         calculateBtn.disabled = true;
         numberInput.disabled = true;
         addBtn.disabled = true;
+        replayBtn.hidden = true;
         svg.innerHTML = '';
-
-        // *** LÓGICA REESCRITA PARA SUMAR TODOS LOS NÚMEROS A LA VEZ ***
         
-        // 1. Preparar todos los números para que tengan la misma longitud
-        let maxIntLength = 0;
-        let maxFracLength = 0;
+        let maxIntLength = 0, maxFracLength = 0;
         numbersToSum.forEach(num => {
             const [intPart, fracPart = ''] = num.split('.');
             if (intPart.length > maxIntLength) maxIntLength = intPart.length;
@@ -88,38 +89,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const paddedNumbers = numbersToSum.map(num => {
             let [intPart, fracPart = ''] = num.split('.');
-            const paddedInt = intPart.padStart(maxIntLength, '0');
-            const paddedFrac = fracPart.padEnd(maxFracLength, '0');
-            return paddedInt + paddedFrac;
+            return intPart.padStart(maxIntLength, '0') + fracPart.padEnd(maxFracLength, '0');
         });
         
         const decimalPosition = maxFracLength;
-
-        // 2. Animar la suma única con todos los números
-        animateMultiSum(paddedNumbers, decimalPosition);
+        lastCalculationData = { paddedNumbers, decimalPosition };
+        animateMultiSum(paddedNumbers, decimalPosition, true);
     }
 
-    async function animateMultiSum(paddedNumbers, decimalPosition) {
-        // Ajustar altura del SVG para que quepan todos los números
+    async function handleReplay() {
+        if (!lastCalculationData) return;
+        replayBtn.disabled = true;
+        resetBtn.disabled = true;
+        await animateMultiSum(lastCalculationData.paddedNumbers, lastCalculationData.decimalPosition, false);
+        replayBtn.disabled = false;
+        resetBtn.disabled = false;
+    }
+
+    async function animateMultiSum(paddedNumbers, decimalPosition, isFirstRun) {
+        svg.innerHTML = '';
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
         svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} ${requiredHeight}`);
-
-        // Dibujar todos los números, la línea, etc.
         setupMultiLineSVG(paddedNumbers, decimalPosition);
         
-        // Realizar el cálculo paso a paso
         const resultString = await performMultiLineStepByStep(paddedNumbers);
 
-        // Formatear el resultado final con su punto decimal
         let finalResultString = resultString;
         if (decimalPosition > 0) {
-            finalResultString = resultString.slice(0, -decimalPosition) + '.' + resultString.slice(-decimalPosition);
+            const integerPart = resultString.slice(0, -decimalPosition) || '0';
+            const fractionalPart = resultString.slice(-decimalPosition);
+            finalResultString = integerPart + '.' + fractionalPart;
         }
 
-        // Actualizar UI con el resultado final
-        const historyText = numbersToSum.join(' + ').replace(/\./g, ',') + ` = ${finalResultString.replace('.', ',')}`;
-        addToHistory(historyText);
-        setExplanation(`¡Suma completada! El resultado final es ${finalResultString.replace('.', ',')}.`);
+        if (isFirstRun) {
+            const historyText = numbersToSum.join(' + ').replace(/\./g, ',') + ` = ${finalResultString.replace('.', ',')}`;
+            addToHistory(historyText);
+            setExplanation(`¡Suma completada! El resultado final es ${finalResultString.replace('.', ',')}.`);
+            replayBtn.hidden = false;
+        } else {
+            setExplanation(`Viendo de nuevo... ¡El resultado es ${finalResultString.replace('.', ',')}!`);
+        }
     }
 
     async function performMultiLineStepByStep(paddedNumbers) {
@@ -128,6 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const numDigits = paddedNumbers[0].length;
 
         for (let i = 0; i < numDigits; i++) {
+            const existingCarry = svg.querySelector('.carry-text');
+            if (existingCarry) {
+                existingCarry.remove();
+            }
+
             const digitIndex = numDigits - 1 - i;
             const x = END_X - (i * COLUMN_WIDTH);
 
@@ -137,7 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let columnSum = carry;
             let explanationDigits = [];
             
-            // Sumar el dígito de cada número en la columna actual
             paddedNumbers.forEach(numStr => {
                 const digit = parseInt(numStr[digitIndex]);
                 columnSum += digit;
@@ -153,7 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const digitForColumn = columnSum % 10;
             carry = Math.floor(columnSum / 10);
-            resultString = digitForColumn + resultString;
+            
+            resultString = digitForColumn + resultString; 
             
             const resultY = Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT;
             svg.appendChild(createSvgElement('text', { x, y: resultY, class: 'digit result-text' }, digitForColumn));
@@ -165,10 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 setExplanation(`Escribimos ${digitForColumn}. No hay llevada.`);
             }
+            await sleep(2000);
         }
         
         if (carry > 0) {
-            await sleep(2000);
+            await sleep(1000);
             setExplanation(`Bajamos la última llevada: ${carry}.`);
             const finalCarryX = END_X - (numDigits * COLUMN_WIDTH);
             const resultY = Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT;
@@ -185,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const numDigits = paddedNumbers[0].length;
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
 
-        // Elementos de la UI (rectángulo de resaltado y signo +)
         svg.appendChild(createSvgElement('rect', {
             id: 'highlight-rect', x: -1000, y: 0, width: COLUMN_WIDTH, height: requiredHeight, class: 'highlight-rect'
         }));
@@ -193,13 +207,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const plusY = Y_START + (paddedNumbers.length - 1) * ROW_HEIGHT;
         svg.appendChild(createSvgElement('text', {x: plusX, y: plusY, class: 'digit plus-sign-svg'}, '+'));
 
-        // Dibujar cada número en su propia fila
         paddedNumbers.forEach((numStr, rowIndex) => {
             const y = Y_START + (rowIndex * ROW_HEIGHT);
-            const colorClass = (rowIndex % 2 === 0) ? 'num1-text' : 'num2-text'; // Alternar colores
+            const colorClass = (rowIndex % 2 === 0) ? 'num1-text' : 'num2-text';
             for (let i = 0; i < numDigits; i++) {
                 const x = END_X - (i * COLUMN_WIDTH);
-                // Punto decimal
                 if (decimalPos > 0 && i === decimalPos - 1) {
                     const decimalX = x + COLUMN_WIDTH / 2;
                     svg.appendChild(createSvgElement('text', { x: decimalX, y: y, class: 'decimal-point' }, '.'));
@@ -208,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Línea de suma y punto decimal del resultado
         const lineY = Y_START + (paddedNumbers.length * ROW_HEIGHT) - (ROW_HEIGHT/2);
         svg.appendChild(createSvgElement('line', {
             x1: END_X - (numDigits * COLUMN_WIDTH) - COLUMN_WIDTH, y1: lineY, x2: END_X + COLUMN_WIDTH / 2, y2: lineY, class: 'sum-line'
@@ -220,19 +231,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 4. FUNCIONES DE AYUDA (sin cambios) ---
-    function createSvgElement(tag, attrs, content = '') { /* ... */ }
-    function setExplanation(text) { /* ... */ }
-    function addToHistory(text) { /* ... */ }
-    function sleep(ms) { /* ... */ }
-
-    // Re-pegar aquí las implementaciones completas de las funciones de ayuda del script anterior
+    // --- FUNCIÓN AUXILIAR CORREGIDA ---
     function createSvgElement(tag, attrs, content = '') {
         const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
         for (const key in attrs) el.setAttribute(key, attrs[key]);
-        if (content) el.textContent = content;
+        // CORRECCIÓN: Se comprueba explícitamente para no ignorar el número 0.
+        if (content !== '' && content !== null && content !== undefined) {
+            el.textContent = content;
+        }
         return el;
     }
+
     function setExplanation(text) {
         explanationText.style.opacity = '0';
         setTimeout(() => {

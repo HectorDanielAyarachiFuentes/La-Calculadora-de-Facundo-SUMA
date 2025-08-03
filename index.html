@@ -11,15 +11,7 @@
 
     <main class="container">
         <header>
-            <header>
-                <h1>🧮 Calculadora Facundo+</h1>
-                <p class="subtitle">Sumas precisas con estilo cuántico</p>
-                <div class="decorative-wave">
-                    <svg viewBox="0 0 500 40" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0 20 Q 125 40 250 20 T 500 20" fill="rgba(118, 75, 162, 0.1)" />
-                    </svg>
-                </div>
-            </header>
+            <h1>🧮 Calculadora Facundo+</h1>
             <p class="subtitle">Suma varios números, ¡con decimales y llevadas!</p>
         </header>
 
@@ -36,17 +28,19 @@
         </div>
         
         <div class="controls">
-            <button id="calculateBtn" class="btn-calculate">¡A Sumar!</button>
+            <button id="calculateBtn" class="btn-calculate" disabled>¡A Sumar!</button>
             <button id="resetBtn" class="btn-reset">Empezar de Nuevo</button>
         </div>
 
         <div id="calculation-area">
-            <svg id="calculation-svg" viewBox="0 0 400 150"></svg>
+            <svg id="calculation-svg" viewBox="0 0 500 200"></svg>
         </div>
 
         <div id="explanation-box">
             <p id="explanation-text">Añade al menos dos números para empezar.</p>
         </div>
+
+        <button id="replayBtn" class="btn-replay" hidden>Repetir Animación</button>
 
         <aside id="history-section">
             <h2>Historial</h2>
