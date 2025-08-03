@@ -11,11 +11,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const historySection = document.getElementById('history-section');
     const operandsContainer = document.getElementById('operands-container');
     const inputContainer = document.getElementById('input-container');
+    // --- INICIO DE LA CORRECCIÓN 1: Nuevos elementos ---
+    const procedureSection = document.getElementById('procedure-section');
+    const procedureList = document.getElementById('procedure-list');
+    // --- FIN DE LA CORRECCIÓN 1 ---
 
     // --- 2. ESTADO GLOBAL ---
     let numbersToSum = [];
     let calculationHistory = [];
-    let editingIndex = null; // <-- NUEVA VARIABLE DE ESTADO
+    let editingIndex = null;
+    let procedureSteps = []; // Almacena los pasos del último cálculo
 
     // --- CONSTANTES SVG ---
     const SVG_WIDTH = 460; const COLUMN_WIDTH = 35; const END_X = SVG_WIDTH - 40;
@@ -27,32 +32,31 @@ document.addEventListener('DOMContentLoaded', () => {
     numberInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addNumber(); } });
     calculateBtn.addEventListener('click', () => startCalculation());
     resetBtn.addEventListener('click', resetCalculator);
+    replayBtn.addEventListener('click', () => { if (calculationHistory.length > 0) startCalculation(calculationHistory[calculationHistory.length - 1]); });
+    historyList.addEventListener('click', (e) => { const li = e.target.closest('li'); if (li && li.dataset.index) startCalculation(calculationHistory[parseInt(li.dataset.index, 10)]); });
+    operandsContainer.addEventListener('click', (e) => { if (calculateBtn.disabled && editingIndex === null) return; if (e.target.classList.contains('delete-btn')) handleDeleteNumber(e.target.dataset.index); else if (e.target.classList.contains('operand-text')) handleEnterEditMode(e.target.dataset.index); });
 
-    // MANEJADORES DE REPETICIÓN
-    replayBtn.addEventListener('click', () => {
-        if (calculationHistory.length > 0) startCalculation(calculationHistory[calculationHistory.length - 1]);
-    });
-    historyList.addEventListener('click', (e) => {
+    // --- INICIO DE LA CORRECCIÓN 2: Eventos para el procedimiento ---
+    procedureList.addEventListener('mouseover', (e) => {
         const li = e.target.closest('li');
-        if (li && li.dataset.index) startCalculation(calculationHistory[parseInt(li.dataset.index, 10)]);
-    });
-
-    // --- INICIO DE LA CORRECCIÓN: Delegación de eventos para editar y borrar ---
-    operandsContainer.addEventListener('click', (e) => {
-        // Si estamos en modo de cálculo, no hacemos nada.
-        if (calculateBtn.disabled && editingIndex === null) return;
-
-        if (e.target.classList.contains('delete-btn')) {
-            handleDeleteNumber(e.target.dataset.index);
-        } else if (e.target.classList.contains('operand-text')) {
-            handleEnterEditMode(e.target.dataset.index);
+        if (li && li.dataset.stepIndex) {
+            const stepIndex = parseInt(li.dataset.stepIndex, 10);
+            const stepData = procedureSteps[stepIndex];
+            if (stepData) {
+                const highlightRect = svg.querySelector('#highlight-rect');
+                highlightRect.setAttribute('x', stepData.x - COLUMN_WIDTH / 2);
+            }
         }
     });
-    // --- FIN DE LA CORRECCIÓN ---
+    procedureList.addEventListener('mouseout', () => {
+        const highlightRect = svg.querySelector('#highlight-rect');
+        if (highlightRect) highlightRect.setAttribute('x', -1000);
+    });
+    // --- FIN DE LA CORRECCIÓN 2 ---
 
-
-    // --- 4. LÓGICA DE LA INTERFAZ (CRUD de números) ---
+    // --- 4. LÓGICA DE LA INTERFAZ ---
     function addNumber() {
+        // ... (sin cambios)
         const value = numberInput.value.trim().replace(',', '.');
         if (value && isFinite(Number(value))) {
             numbersToSum.push(value);
@@ -62,153 +66,124 @@ document.addEventListener('DOMContentLoaded', () => {
         } else { setExplanation(`"${numberInput.value}" no es un número válido.`); }
     }
 
+    function renderOperands() {
+        // ... (sin cambios)
+        operandsContainer.innerHTML = '';
+        if (numbersToSum.length === 0) {
+            operandsContainer.innerHTML = `<div style="color: #ccc; font-size: 1.2rem; width:100%; text-align:center; font-weight:400; padding: 4rem 0;">Tu suma aparecerá aquí</div>`;
+        }
+        numbersToSum.forEach((num, index) => {
+            const item = document.createElement('div');
+            item.className = 'operand-item';
+            const deleteButtonHTML = `<button class="delete-btn" data-index="${index}">×</button>`;
+            if (index === editingIndex) {
+                item.innerHTML = `<input type="text" class="edit-input" value="${num.replace('.',',')}" /> ${deleteButtonHTML}`;
+                const input = item.querySelector('.edit-input');
+                setTimeout(() => { input.focus(); input.select(); }, 0);
+                input.addEventListener('blur', handleSaveEdit);
+                input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } if (e.key === 'Escape') { editingIndex = null; renderOperands(); } });
+            } else {
+                item.innerHTML = `<span class="operand-text" data-index="${index}">${num.replace('.',',')}</span> ${deleteButtonHTML}`;
+            }
+            operandsContainer.appendChild(item);
+        });
+        calculateBtn.disabled = numbersToSum.length < 2 || editingIndex !== null;
+        if (editingIndex !== null) { setExplanation("Editando... Pulsa Enter para guardar, o Esc para cancelar."); }
+        else if (numbersToSum.length >= 2) { setExplanation("¡Listo para sumar! O sigue añadiendo números."); }
+    }
+
     function handleDeleteNumber(index) {
-        editingIndex = null; // Salir de modo edición si se está editando
+        // ... (sin cambios)
+        editingIndex = null;
         numbersToSum.splice(index, 1);
         renderOperands();
     }
 
     function handleEnterEditMode(index) {
+        // ... (sin cambios)
         editingIndex = parseInt(index, 10);
         renderOperands();
     }
 
     function handleSaveEdit(event) {
+        // ... (sin cambios)
         const input = event.target;
         const index = editingIndex;
         if (index === null) return;
-
         const newValue = input.value.trim().replace(',', '.');
-
-        if (newValue && isFinite(Number(newValue))) {
-            numbersToSum[index] = newValue;
-        } else {
-            setExplanation(`"${input.value}" no es válido. Se restauró el valor anterior.`);
-        }
-        
-        editingIndex = null; // Salir del modo edición
+        if (newValue && isFinite(Number(newValue))) { numbersToSum[index] = newValue; }
+        else { setExplanation(`"${input.value}" no es válido. Se restauró el valor anterior.`); }
+        editingIndex = null;
         renderOperands();
-    }
-
-    function renderOperands() {
-        operandsContainer.innerHTML = '';
-        if (numbersToSum.length === 0) {
-            operandsContainer.innerHTML = `<div style="color: #ccc; font-size: 1.2rem; width:100%; text-align:center; font-weight:400; padding: 4rem 0;">Tu suma aparecerá aquí</div>`;
-        }
-
-        numbersToSum.forEach((num, index) => {
-            const item = document.createElement('div');
-            item.className = 'operand-item';
-            
-            const deleteButtonHTML = `<button class="delete-btn" data-index="${index}">×</button>`;
-
-            if (index === editingIndex) {
-                // MODO EDICIÓN: Renderizar un input
-                item.innerHTML = `<input type="text" class="edit-input" value="${num.replace('.',',')}" /> ${deleteButtonHTML}`;
-                const input = item.querySelector('.edit-input');
-                setTimeout(() => { input.focus(); input.select(); }, 0); // Focus y seleccionar texto
-                
-                input.addEventListener('blur', handleSaveEdit);
-                input.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-                    if (e.key === 'Escape') { editingIndex = null; renderOperands(); }
-                });
-            } else {
-                // MODO VISUALIZACIÓN: Renderizar un span
-                item.innerHTML = `<span class="operand-text" data-index="${index}">${num.replace('.',',')}</span> ${deleteButtonHTML}`;
-            }
-            operandsContainer.appendChild(item);
-        });
-
-        calculateBtn.disabled = numbersToSum.length < 2 || editingIndex !== null;
-        if (editingIndex !== null) {
-            setExplanation("Editando... Pulsa Enter para guardar, o Esc para cancelar.");
-        } else if (numbersToSum.length >= 2) {
-            setExplanation("¡Listo para sumar! O sigue añadiendo números.");
-        }
-    }
-    
-    function resetCalculator() {
-        numbersToSum = [];
-        editingIndex = null; // Resetear el estado de edición
-        setUIMode('input');
-        renderOperands();
-        setExplanation('Añade al menos dos números para empezar.');
     }
 
     function setUIMode(mode) {
-        if (mode === 'input') {
-            inputContainer.classList.remove('hidden');
-            calculateBtn.classList.remove('hidden');
-            replayBtn.classList.add('hidden');
-            operandsContainer.classList.remove('hidden');
-            svg.classList.add('hidden');
-            svg.innerHTML = '';
-            calculateBtn.disabled = numbersToSum.length < 2;
-        } 
-        else if (mode === 'calculating') {
-            inputContainer.classList.add('hidden');
-            calculateBtn.classList.add('hidden');
-            replayBtn.classList.add('hidden');
-            operandsContainer.classList.add('hidden');
-            svg.classList.remove('hidden');
-        }
-        else if (mode === 'result') {
-            inputContainer.classList.add('hidden');
-            calculateBtn.classList.add('hidden');
-            replayBtn.classList.remove('hidden');
-            svg.classList.remove('hidden');
-        }
+        // ... (sin cambios)
+        inputContainer.classList.toggle('hidden', mode !== 'input');
+        calculateBtn.classList.toggle('hidden', mode !== 'input');
+        replayBtn.classList.toggle('hidden', mode !== 'result');
+        operandsContainer.classList.toggle('hidden', mode !== 'input');
+        svg.classList.toggle('hidden', mode === 'input');
+    }
+
+    function resetCalculator() {
+        numbersToSum = [];
+        editingIndex = null;
+        setUIMode('input');
+        renderOperands();
+        setExplanation('Añade al menos dos números para empezar.');
+        // --- INICIO DE LA CORRECCIÓN 3: Ocultar secciones extra ---
+        procedureSection.classList.add('hidden');
+        procedureList.innerHTML = '';
+        // --- FIN DE LA CORRECCIÓN 3 ---
     }
     
-    // --- 5. LÓGICA DEL CÁLCULO (Sin cambios significativos) ---
+    // --- 5. LÓGICA DEL CÁLCULO ---
     async function startCalculation(replayData = null) {
         setUIMode('calculating');
+        // --- INICIO DE LA CORRECCIÓN 4: Limpiar procedimiento anterior ---
+        procedureSection.classList.add('hidden');
+        procedureList.innerHTML = '';
+        // --- FIN DE LA CORRECCIÓN 4 ---
         let calculationData;
         if (replayData) {
             calculationData = replayData;
         } else {
             let maxIntLength = 0, maxFracLength = 0;
             numbersToSum.forEach(num => {
-                const [intPart, fracPart = ''] = num.split('.');
+                const [intPart = '0', fracPart = ''] = num.split('.');
                 maxIntLength = Math.max(maxIntLength, intPart.length);
-                maxFracLength = Math.max(maxFracLength, fracPart ? fracPart.length : 0);
+                maxFracLength = Math.max(maxFracLength, fracPart.length);
             });
             const paddedNumbers = numbersToSum.map(num => {
-                let [intPart, fracPart = ''] = num.split('.');
+                let [intPart = '0', fracPart = ''] = num.split('.');
                 return intPart.padStart(maxIntLength, '0') + fracPart.padEnd(maxFracLength, '0');
             });
             calculationData = { paddedNumbers, decimalPosition: maxFracLength, originalNumbers: [...numbersToSum] };
             addToHistory(calculationData);
         }
         const { paddedNumbers, decimalPosition, originalNumbers } = calculationData;
-        const resultString = await animateMultiSum(paddedNumbers, decimalPosition);
-        let finalResultString = resultString;
-        if (decimalPosition > 0) {
-            const integerPart = resultString.slice(0, -decimalPosition) || '0';
-            finalResultString = integerPart + '.' + resultString.slice(-decimalPosition);
-        }
+        await animateMultiSum(paddedNumbers, decimalPosition);
+        let finalResultString = calculationHistory[calculationHistory.length - 1].resultString;
+        
         setUIMode('result');
         setExplanation(`¡Suma completada! El resultado final es ${finalResultString.replace('.', ',')}.`);
+        renderProcedure(); // <-- Renderizar procedimiento al final
     }
 
     function addToHistory(calcData) {
+        // ... (sin cambios)
         historySection.classList.remove('hidden');
         const index = calculationHistory.length;
+        let result = BigInt(0);
+        calcData.paddedNumbers.forEach(numStr => result += BigInt(numStr));
+        let resultString = result.toString().padStart(calcData.decimalPosition + 1, '0');
+        if (calcData.decimalPosition > 0) resultString = resultString.slice(0, -calcData.decimalPosition) + '.' + resultString.slice(-calcData.decimalPosition);
+        calcData.resultString = resultString;
         calculationHistory.push(calcData);
         const li = document.createElement('li');
         li.dataset.index = index;
-        let result = BigInt(0);
-        calcData.originalNumbers.forEach(numStr => {
-            const [intPart = '0', fracPart = ''] = numStr.split('.');
-            const combined = intPart + fracPart.padEnd(calcData.decimalPosition, '0');
-            result += BigInt(combined);
-        });
-        let resultString = result.toString().padStart(calcData.decimalPosition + 1, '0');
-        if (calcData.decimalPosition > 0) {
-            resultString = resultString.slice(0, -calcData.decimalPosition) + ',' + resultString.slice(-calcData.decimalPosition);
-        }
-        li.textContent = calcData.originalNumbers.join(' + ').replace(/\./g, ',') + ` = ${resultString}`;
+        li.textContent = calcData.originalNumbers.join(' + ').replace(/\./g, ',') + ` = ${resultString.replace('.', ',')}`;
         historyList.prepend(li);
     }
     
@@ -219,55 +194,74 @@ document.addEventListener('DOMContentLoaded', () => {
         svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} ${requiredHeight}`);
         svg.innerHTML = ''; 
         setupMultiLineSVG(paddedNumbers, decimalPos);
-        return await performMultiLineStepByStep(paddedNumbers, decimalPos);
+        await performMultiLineStepByStep(paddedNumbers, decimalPos);
     }
     
     async function performMultiLineStepByStep(paddedNumbers, decimalPos) {
-        // ... (sin cambios)
-        let carry = 0;
-        let resultString = '';
+        procedureSteps = []; // Limpiar pasos del cálculo anterior
+        let carry = 0, resultString = '', allCarries = [];
         const numDigits = paddedNumbers[0].length;
         const resultY = Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT;
-        let allCarries = [];
-        if (decimalPos > 0) {
-            const decimalX = END_X - ((decimalPos - 1) * COLUMN_WIDTH) + COLUMN_WIDTH / 2;
-            svg.appendChild(createSvgElement('text', { x: decimalX, y: resultY, class: 'decimal-point' }, '.'));
-        }
+        if (decimalPos > 0) svg.appendChild(createSvgElement('text', { x: END_X - ((decimalPos - 1) * COLUMN_WIDTH) + COLUMN_WIDTH / 2, y: resultY, class: 'decimal-point' }, '.'));
+
         for (let i = 0; i < numDigits; i++) {
-            const digitIndex = numDigits - 1 - i;
-            const x = END_X - (i * COLUMN_WIDTH);
+            const digitIndex = numDigits - 1 - i, x = END_X - (i * COLUMN_WIDTH);
             document.getElementById('highlight-rect').setAttribute('x', x - COLUMN_WIDTH / 2);
             await sleep(1200);
             let columnSum = carry;
-            paddedNumbers.forEach(numStr => columnSum += parseInt(numStr[digitIndex]));
+            let explanationDigits = [];
+            paddedNumbers.forEach(numStr => {
+                const digit = parseInt(numStr[digitIndex]);
+                columnSum += digit;
+                explanationDigits.push(digit);
+            });
             const digitForColumn = columnSum % 10;
-            carry = Math.floor(columnSum / 10);
+            const newCarry = Math.floor(columnSum / 10);
+            
+            // --- INICIO DE LA CORRECCIÓN 5: Guardar el paso ---
+            procedureSteps.push({ digits: explanationDigits, carryIn: carry, sum: columnSum, resultDigit: digitForColumn, carryOut: newCarry, x });
+            // --- FIN DE LA CORRECCIÓN 5 ---
+            
+            carry = newCarry;
             resultString = digitForColumn + resultString;
             setExplanation(`Columna: ...${columnSum}. Se escribe ${digitForColumn}, se lleva ${carry}.`);
             svg.appendChild(createSvgElement('text', { x, y: resultY, class: 'digit result-text' }, digitForColumn));
             const prevCarry = svg.querySelector('.carry-text');
             if (prevCarry) prevCarry.remove();
             if (carry > 0) {
-                const carryX = x - COLUMN_WIDTH;
-                allCarries.push({ value: carry, x: carryX });
-                svg.appendChild(createSvgElement('text', { x: carryX, y: Y_CARRY, class: 'digit carry-text' }, carry));
+                allCarries.push({ value: carry, x: x - COLUMN_WIDTH });
+                svg.appendChild(createSvgElement('text', { x: x - COLUMN_WIDTH, y: Y_CARRY, class: 'digit carry-text' }, carry));
             }
             await sleep(1500);
         }
+        
         if (carry > 0) {
             setExplanation(`Se baja la última llevada: ${carry}.`);
             await sleep(1000);
-            const finalCarryX = END_X - (numDigits * COLUMN_WIDTH);
-            svg.appendChild(createSvgElement('text', { x: finalCarryX, y: resultY, class: 'digit result-text' }, carry));
+            svg.appendChild(createSvgElement('text', { x: END_X - (numDigits * COLUMN_WIDTH), y: resultY, class: 'digit result-text' }, carry));
             resultString = carry + resultString;
         }
+        
         document.getElementById('highlight-rect').setAttribute('x', -1000);
         const finalFloatingCarry = svg.querySelector('.carry-text');
         if (finalFloatingCarry) finalFloatingCarry.remove();
-        allCarries.forEach(c => {
-            svg.appendChild(createSvgElement('text', { x: c.x, y: Y_CARRY, class: 'digit carry-text' }, c.value));
+        allCarries.forEach(c => svg.appendChild(createSvgElement('text', { x: c.x, y: Y_CARRY, class: 'digit carry-text' }, c.value)));
+    }
+
+    function renderProcedure() {
+        procedureList.innerHTML = '';
+        if (procedureSteps.length === 0) return;
+
+        procedureSection.classList.remove('hidden');
+        procedureSteps.forEach((step, index) => {
+            const li = document.createElement('li');
+            li.dataset.stepIndex = index;
+            let explanation = `<strong>Columna ${index + 1}:</strong> Se suma ${step.digits.join(' + ')}`;
+            if (step.carryIn > 0) explanation += ` + ${step.carryIn} (llevada)`;
+            explanation += ` = ${step.sum}. Se escribe ${step.resultDigit} y se lleva ${step.carryOut}.`;
+            li.innerHTML = explanation;
+            procedureList.appendChild(li);
         });
-        return resultString;
     }
 
     function setupMultiLineSVG(paddedNumbers, decimalPos) {
@@ -275,22 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const numDigits = paddedNumbers[0].length;
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
         svg.appendChild(createSvgElement('rect', { id: 'highlight-rect', x: -1000, y: 0, width: COLUMN_WIDTH, height: requiredHeight, class: 'highlight-rect' }));
-        if (paddedNumbers.length > 1) {
-            const plusX = END_X - (numDigits * COLUMN_WIDTH) - (COLUMN_WIDTH * 0.5);
-            const plusY = Y_START + ((paddedNumbers.length - 1) * ROW_HEIGHT);
-            svg.appendChild(createSvgElement('text', { x: plusX, y: plusY, class: 'digit plus-sign-svg' }, '+'));
-        }
-        paddedNumbers.forEach((numStr, rowIndex) => {
-            const y = Y_START + (rowIndex * ROW_HEIGHT);
-            const colorClass = (rowIndex % 2 === 0) ? 'num1-text' : 'num2-text';
-            for (let i = 0; i < numDigits; i++) {
-                const x = END_X - (i * COLUMN_WIDTH);
-                if (decimalPos > 0 && i === decimalPos - 1) {
-                    svg.appendChild(createSvgElement('text', { x: x + COLUMN_WIDTH / 2, y: y, class: 'decimal-point' }, '.'));
-                }
-                svg.appendChild(createSvgElement('text', { x, y, class: `digit ${colorClass}` }, numStr[numDigits - 1 - i]));
-            }
-        });
+        if (paddedNumbers.length > 1) { const plusX = END_X - (numDigits * COLUMN_WIDTH) - (COLUMN_WIDTH * 0.5); const plusY = Y_START + ((paddedNumbers.length - 1) * ROW_HEIGHT); svg.appendChild(createSvgElement('text', { x: plusX, y: plusY, class: 'digit plus-sign-svg' }, '+')); }
+        paddedNumbers.forEach((numStr, rowIndex) => { const y = Y_START + (rowIndex * ROW_HEIGHT); const colorClass = (rowIndex % 2 === 0) ? 'num1-text' : 'num2-text'; for (let i = 0; i < numDigits; i++) { const x = END_X - (i * COLUMN_WIDTH); if (decimalPos > 0 && i === decimalPos - 1) { svg.appendChild(createSvgElement('text', { x: x + COLUMN_WIDTH / 2, y: y, class: 'decimal-point' }, '.')); } svg.appendChild(createSvgElement('text', { x, y, class: `digit ${colorClass}` }, numStr[numDigits - 1 - i])); } });
         const lineY = Y_START + (paddedNumbers.length * ROW_HEIGHT) - (ROW_HEIGHT / 2);
         svg.appendChild(createSvgElement('line', { x1: END_X - (numDigits * COLUMN_WIDTH) - COLUMN_WIDTH * 1.5, y1: lineY, x2: END_X + COLUMN_WIDTH / 2, y2: lineY, class: 'sum-line-svg' }));
     }
