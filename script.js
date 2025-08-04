@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (cantidadDeCeros > 0) {
                 if (cantidadDeCeros === 1) {
-                    descripcion += `Veo un cero por aquí... pero recuerda, los ceros no suman, ¡como tu papá en tu cumpleaños! `;
+                    descripcion += `Veo un cero por aquí... pero recuerda, los ceros no suman, así que no lo contamos. `;
                 } else {
                     descripcion += `¡Mira! Hay ${numeroALetras(cantidadDeCeros)} ceros. Pero como sabes, los ceros no suman nada. `;
                 }
@@ -527,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     listaDeNumeros = numerosEnPalabras.join(' y ');
                 }
-                descripcion += `Así que solo juntamos ${listaDeNumeros}. `;
+                descripcion += `Así que solo Sumamos ${listaDeNumeros}. `;
             } else if (cantidadDeCeros > 0) {
                 descripcion += `Como solo hay ceros, el resultado es... ¡cero! `;
             }
