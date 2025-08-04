@@ -1,8 +1,7 @@
-
 /**
  * La Calculadora de Facundo+ - Script Principal
  * Autor: Hector Daniel Ayuarachi Fuentes - https://codepen.io/HectorDanielAyarachiFuentes - https://github.com/HectorDanielAyarachiFuentes
- * Fecha: 205
+ * Fecha: 2024
  * Licencia: MIT
  * Descripción: Maneja toda la lógica interactiva de la calculadora, incluyendo
  * la adición de números, la animación de la suma, el historial, el modo oscuro
@@ -26,15 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const procedureList = document.getElementById('procedure-list');
     const motivationForKidBtn = document.getElementById('motivationForKid');
     const motivationForAdultBtn = document.getElementById('motivationForAdult');
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
 
-    // --- 2. ESTADO GLOBAL ---
+    // --- 2. ESTADO GLOBAL Y CONSTANTES ---
     let numbersToSum = [];
     let calculationHistory = [];
     let editingIndex = null;
     let procedureSteps = [];
-    let currentCalculationData = null; // *** NUEVO: Para saber qué cálculo se está mostrando
+    let currentCalculationData = null;
 
-    // --- CONSTANTES ---
     const SVG_WIDTH = 460;
     const COLUMN_WIDTH = 35;
     const END_X = SVG_WIDTH - 40;
@@ -42,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ROW_HEIGHT = 45;
     const Y_CARRY = 25;
     const HISTORY_STORAGE_KEY = 'facundoCalcHistory';
+    const THEME_STORAGE_KEY = 'facundoCalcTheme';
 
     // --- 3. MANEJADORES DE EVENTOS ---
     addBtn.addEventListener('click', addNumber);
@@ -49,11 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
     numberInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addNumber(); } });
     calculateBtn.addEventListener('click', () => startCalculation());
     resetBtn.addEventListener('click', resetCalculator);
-    // *** MODIFICADO: ReplayBtn ahora usa el cálculo actual ***
     replayBtn.addEventListener('click', () => { if (currentCalculationData) startCalculation(currentCalculationData); });
-    // *** MODIFICADO: El clic en el historial ahora muestra el resultado al instante ***
-    historyList.addEventListener('click', (e) => { 
-        const li = e.target.closest('li'); 
+    historyList.addEventListener('click', (e) => {
+        const li = e.target.closest('li');
         if (li && li.dataset.index) {
             const index = parseInt(li.dataset.index, 10);
             showStaticResult(calculationHistory[index]);
@@ -78,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     motivationForKidBtn.addEventListener('click', () => readRandomMotivation('kid'));
     motivationForAdultBtn.addEventListener('click', () => readRandomMotivation('adult'));
+    themeToggleBtn.addEventListener('click', toggleTheme);
 
     // --- 4. LÓGICA DE LA INTERFAZ ---
     function addNumber() {
@@ -161,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetCalculator() {
         numbersToSum = [];
         editingIndex = null;
-        currentCalculationData = null; // Limpiar el cálculo actual
+        currentCalculationData = null;
         setUIMode('input');
         renderOperands();
         setExplanation('Añade al menos dos números para empezar.');
@@ -182,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderHistory();
         }
     }
-    
+
     function renderHistory() {
         historyList.innerHTML = '';
         if (calculationHistory.length > 0) {
@@ -225,8 +224,8 @@ document.addEventListener('DOMContentLoaded', () => {
             calculationData = { paddedNumbers, decimalPosition: maxFracLength, originalNumbers: [...numbersToSum] };
             addToHistory(calculationData);
         }
-        
-        currentCalculationData = calculationData; // Guardar el cálculo actual
+
+        currentCalculationData = calculationData;
         const { paddedNumbers, decimalPosition } = calculationData;
         await animateMultiSum(paddedNumbers, decimalPosition);
 
@@ -234,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderProcedure();
         setupVoiceReader();
     }
-    
+
     function addToHistory(calcData) {
         let result = BigInt(0);
         calcData.paddedNumbers.forEach(numStr => { result += BigInt(numStr); });
@@ -245,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resultString = `${intPart}.${fracPart}`;
         }
         calcData.resultString = resultString;
-        
+
         calculationHistory.unshift(calcData);
         saveHistoryToLocalStorage();
         renderHistory();
@@ -259,34 +258,28 @@ document.addEventListener('DOMContentLoaded', () => {
         setupMultiLineSVG(paddedNumbers, decimalPos);
         await performMultiLineStepByStep(paddedNumbers, decimalPos);
     }
-    
-    // *** NUEVA FUNCIÓN PARA MOSTRAR RESULTADO ESTÁTICO ***
+
+    // CORREGIDO: Esta función ya no añade un cero extra al resultado.
     function showStaticResult(calcData) {
-        currentCalculationData = calcData; // Guardar como cálculo actual para el botón de repetir
-        procedureSteps = []; // Reiniciar los pasos del procedimiento
-        setUIMode('result'); // Cambiar a la vista de resultado
-        svg.innerHTML = ''; // Limpiar el SVG
-        
+        currentCalculationData = calcData;
+        procedureSteps = [];
+        setUIMode('result');
+        svg.innerHTML = '';
+
         const { paddedNumbers, decimalPosition, resultString } = calcData;
         const numDigits = paddedNumbers[0].length;
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
         svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} ${requiredHeight}`);
 
-        // 1. Dibujar la suma base (números y línea)
         setupMultiLineSVG(paddedNumbers, decimalPosition);
 
-        // 2. Calcular y dibujar el resultado y las llevadas instantáneamente
         let carry = 0;
         let allCarries = [];
-        let fullResultWithCarry = "";
-
-        // Calcular el resultado completo incluyendo la última llevada
+        
         let sumTotal = BigInt(0);
         paddedNumbers.forEach(num => sumTotal += BigInt(num));
-        fullResultWithCarry = sumTotal.toString().padStart(numDigits + 1, '0');
+        let fullResultWithCarry = sumTotal.toString(); // Corrección aplicada aquí
 
-
-        // Iterar para encontrar las llevadas
         for (let i = 0; i < numDigits; i++) {
             const digitIndex = numDigits - 1 - i;
             let columnSum = carry;
@@ -294,8 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 columnSum += parseInt(numStr[digitIndex]);
             });
             const newCarry = Math.floor(columnSum / 10);
-            
-            // Guardar en procedureSteps para la lectura de voz
             const stepDigits = paddedNumbers.map(num => parseInt(num[digitIndex]));
             procedureSteps.push({ digits: stepDigits, carryIn: carry, sum: columnSum, resultDigit: columnSum % 10, carryOut: newCarry, x: END_X - (i * COLUMN_WIDTH) });
 
@@ -304,30 +295,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 allCarries.push({ value: carry, x: END_X - ((i + 1) * COLUMN_WIDTH) });
             }
         }
-        
-        // 3. Dibujar el resultado completo
+
         for (let i = 0; i < fullResultWithCarry.length; i++) {
             const digit = fullResultWithCarry[fullResultWithCarry.length - 1 - i];
             const x = END_X - (i * COLUMN_WIDTH);
             svg.appendChild(createSvgElement('text', { x, y: Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT, class: 'digit result-text' }, digit));
         }
 
-        // 4. Dibujar todas las llevadas
         allCarries.forEach(c => svg.appendChild(createSvgElement('text', { x: c.x, y: Y_CARRY, class: 'digit carry-text' }, c.value)));
 
-        // 5. Dibujar el punto decimal si es necesario
         if (decimalPosition > 0) {
             const resultY = Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT;
             const decimalXForResult = END_X - (decimalPosition * COLUMN_WIDTH) + COLUMN_WIDTH / 2;
             svg.appendChild(createSvgElement('text', { x: decimalXForResult, y: resultY, class: 'decimal-point' }, '.'));
         }
 
-        // 6. Actualizar UI
         setExplanation(`Mostrando el resultado de la suma: ${resultString.replace('.', ',')}.`);
         renderProcedure();
         setupVoiceReader();
     }
-
 
     async function performMultiLineStepByStep(paddedNumbers, decimalPos) {
         procedureSteps = [];
@@ -447,13 +433,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-    
+
     // --- 7. LÓGICA DE VOZ Y MOTIVACIÓN ---
     const unidades = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"];
     const especiales = ["diez", "once", "doce", "trece", "catorce", "quince", "dieciseis", "diecisiete", "dieciocho", "diecinueve"];
     const decenas = ["", "", "veinte", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa"];
     const centenas = ["", "ciento", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos"];
-    
+
     function numeroALetras(n) {
         if (n === 0) return "cero";
         if (n < 0) return "menos " + numeroALetras(Math.abs(n));
@@ -467,22 +453,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return partes.join(" ");
     }
 
-    const kidMotivations = [
-        "Puedes brillar, ¡no importa de qué estés hecho!",
-        "La perfección no existe, eres hermoso como eres. Con todas tus imperfecciones lograrás lo que quieras, te lo juro por Dieguito Maradona.",
-        "¡Cada error es una oportunidad para aprender algo nuevo! ¡Sigue intentando!",
-        "¡Eres más valiente de lo que crees y más inteligente de lo que piensas!",
-        "¡Wow, qué bien lo estás haciendo! Cada suma te hace más fuerte.",
-        "El secreto para salir adelante es empezar. ¡Y tú ya empezaste!"
-    ];
-    const adultMotivations = [
-        "NO ME RETES VIEJA CHOTA, NA MENTIRA XD!.",
-        "Gracias por enseñar con paciencia. Estás construyendo la confianza de un niño, un número a la vez.",
-        "Recuerda que el objetivo no es la respuesta correcta, sino el proceso de aprender y descubrir juntos.",
-        "Tu apoyo y ánimo son las herramientas más importantes en este viaje de aprendizaje.",
-        "Celebrar los pequeños logros crea grandes aprendices. ¡Sigue así!",
-        "Enseñar es dejar una huella en el futuro. Gracias por tu dedicación."
-    ];
+    const kidMotivations = ["Puedes brillar, ¡no importa de qué estés hecho!", "La perfección no existe, eres hermoso como eres. Con todas tus imperfecciones lograrás lo que quieras, te lo juro por Dieguito Maradona.", "¡Cada error es una oportunidad para aprender algo nuevo! ¡Sigue intentando!", "¡Eres más valiente de lo que crees y más inteligente de lo que piensas!", "¡Wow, qué bien lo estás haciendo! Cada suma te hace más fuerte.", "El secreto para salir adelante es empezar. ¡Y tú ya empezaste!"];
+    const adultMotivations = ["NO ME RETES VIEJA CHOTA, NA MENTIRA XD!.", "Gracias por enseñar con paciencia. Estás construyendo la confianza de un niño, un número a la vez.", "Recuerda que el objetivo no es la respuesta correcta, sino el proceso de aprender y descubrir juntos.", "Tu apoyo y ánimo son las herramientas más importantes en este viaje de aprendizaje.", "Celebrar los pequeños logros crea grandes aprendices. ¡Sigue así!", "Enseñar es dejar una huella en el futuro. Gracias por tu dedicación."];
 
     function leerEnVoz(texto) {
         if ('speechSynthesis' in window) {
@@ -504,22 +476,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupVoiceReader() {
         if (!procedureList) return;
-
         const handleProcedureClick = (event) => {
             const listItem = event.target.closest('li');
             if (!listItem || !listItem.dataset.stepIndex) return;
             const stepIndex = parseInt(listItem.dataset.stepIndex, 10);
             const stepData = procedureSteps[stepIndex];
-
             if (!stepData) {
                 leerEnVoz(listItem.textContent);
                 return;
             }
-
             let descripcion = `Columna ${stepIndex + 1}. ¡A ver qué tenemos aquí! `;
             const numerosQueSuman = stepData.digits.filter(d => d > 0);
             const cantidadDeCeros = stepData.digits.length - numerosQueSuman.length;
-
             if (cantidadDeCeros > 0) {
                 if (cantidadDeCeros === 1) {
                     descripcion += `Veo un cero por aquí... pero recuerda, los ceros no suman, así que no lo contamos. `;
@@ -527,7 +495,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     descripcion += `¡Mira! Hay ${numeroALetras(cantidadDeCeros)} ceros. Pero como sabes, los ceros no suman nada. `;
                 }
             }
-
             if (numerosQueSuman.length > 0) {
                 const numerosEnPalabras = numerosQueSuman.map(d => numeroALetras(d));
                 let listaDeNumeros;
@@ -542,19 +509,15 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (cantidadDeCeros > 0) {
                 descripcion += `Como solo hay ceros, el resultado es... ¡cero! `;
             }
-
             if (stepData.carryIn > 0) {
                 descripcion += `Ah, ¡pero no nos olvidemos de sumar el ${numeroALetras(stepData.carryIn)} que guardamos antes! `;
             }
-
             if (numerosQueSuman.length === 0 && stepData.carryIn > 0) {
-                 descripcion += `Así que el total es ${numeroALetras(stepData.sum)}. `;
+                descripcion += `Así que el total es ${numeroALetras(stepData.sum)}. `;
             } else {
-                 descripcion += `Todo eso nos da ${numeroALetras(stepData.sum)}. `;
+                descripcion += `Todo eso nos da ${numeroALetras(stepData.sum)}. `;
             }
-
             descripcion += `Entonces, abajo ponemos un ${numeroALetras(stepData.resultDigit)}. `;
-
             if (stepIndex === procedureSteps.length - 1) {
                 if (stepData.carryOut > 0) {
                     descripcion += `Y guardamos el ${numeroALetras(stepData.carryOut)}. Como ya no hay más columnas, lo ponemos al principio del resultado. ¡Y así terminamos la cuenta!`;
@@ -570,13 +533,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             leerEnVoz(descripcion.replace(/ +/g, ' ').trim());
         };
-
         procedureList.removeEventListener('click', handleProcedureClick);
         procedureList.addEventListener('click', handleProcedureClick);
     }
 
+    // --- 8. LÓGICA DE TEMA OSCURO ---
+    function toggleTheme() {
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+        localStorage.setItem(THEME_STORAGE_KEY, isDarkMode ? 'dark' : 'light');
+        updateThemeButton(isDarkMode);
+    }
+
+    function updateThemeButton(isDarkMode) {
+        themeToggleBtn.innerHTML = isDarkMode ? '☀️' : '🌙';
+        themeToggleBtn.setAttribute('aria-label', isDarkMode ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+    }
+
+    function applyInitialTheme() {
+        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let isDarkMode = false;
+
+        if (savedTheme) {
+            isDarkMode = savedTheme === 'dark';
+        } else {
+            isDarkMode = prefersDark;
+        }
+
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+        }
+        updateThemeButton(isDarkMode);
+    }
+
     // --- INICIALIZACIÓN ---
     function init() {
+        applyInitialTheme();
         loadHistoryFromLocalStorage();
         resetCalculator();
     }

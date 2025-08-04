@@ -478,3 +478,137 @@ header {
     transition: all 0.2s ease-in-out;
     position: relative;
 }
+
+
+/* ==============================================
+   ===      ESTILOS PARA MODO OSCURO          ===
+   ============================================== */
+
+/* --- 1. Estilos para el botón de cambio de tema --- */
+.header-top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    position: relative; /* Para alinear el título y el botón */
+    width: 100%;
+}
+
+.theme-btn {
+    background: #f1f3f5;
+    border: 1px solid var(--line-color);
+    color: var(--result-dark);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.theme-btn:hover {
+    background-color: var(--primary-purple);
+    color: white;
+    transform: translateY(-2px) scale(1.1);
+}
+
+
+/* --- 2. Variables y estilos para el modo oscuro --- */
+body.dark-mode {
+    --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #1a222a 100%);
+    --container-bg: rgba(44, 62, 80, 0.9);
+    --result-dark: #ecf0f1; /* Texto claro para fondos oscuros */
+    --text-light: #95a5a6;
+    --line-color: #3b5066;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Sobrescribir estilos de componentes específicos */
+body.dark-mode #whiteboard {
+    background: #2c3e50;
+    border-color: var(--line-color);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+body.dark-mode .operand-item:last-child::before {
+     color: var(--text-light);
+}
+
+body.dark-mode .edit-input {
+    background-color: #34495e80;
+    color: #fff;
+}
+
+body.dark-mode .delete-btn {
+    background: #5e3d43;
+    color: #ff8a80;
+}
+
+body.dark-mode #numberInput {
+    background-color: #34495e;
+    border-color: var(--line-color);
+    color: var(--result-dark);
+}
+
+body.dark-mode #numberInput::placeholder {
+    color: var(--text-light);
+}
+
+body.dark-mode #numberInput:focus {
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 10px rgba(110, 72, 170, 0.4);
+}
+
+body.dark-mode #explanation-box {
+    background-color: rgba(94, 53, 177, 0.2);
+    border-left-color: #9575cd;
+}
+
+body.dark-mode #explanation-text {
+    color: #d1c4e9;
+}
+
+body.dark-mode #procedure-list li,
+body.dark-mode #history-list li {
+    background-color: #34495e;
+    border-color: var(--line-color);
+}
+
+body.dark-mode #procedure-list li:hover {
+    background-color: rgba(110, 72, 170, 0.3);
+    border-color: var(--primary-purple);
+}
+
+body.dark-mode #history-list li:hover {
+    background-color: #4b6680;
+    border-color: var(--primary-purple);
+}
+
+body.dark-mode .footer-btn,
+body.dark-mode .theme-btn {
+    background-color: #34495e;
+    color: var(--text-light);
+    border-color: var(--line-color);
+}
+
+body.dark-mode .footer-btn:hover,
+body.dark-mode .theme-btn:hover {
+    background-color: var(--primary-purple);
+    color: white;
+    border-color: var(--primary-purple);
+}
+
+body.dark-mode .logo-svg rect {
+    fill: #9575cd;
+}
+
+body.dark-mode .footer-logo span {
+    color: #b39ddb;
+}
+
+body.dark-mode .sum-line-svg {
+    stroke: var(--result-dark);
+}
