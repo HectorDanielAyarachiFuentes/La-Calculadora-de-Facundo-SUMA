@@ -1,3 +1,14 @@
+
+/**
+ * La Calculadora de Facundo+ - Script Principal
+ * Autor: Hector Daniel Ayuarachi Fuentes - https://codepen.io/HectorDanielAyarachiFuentes - https://github.com/HectorDanielAyarachiFuentes
+ * Fecha: 205
+ * Licencia: MIT
+ * Descripción: Maneja toda la lógica interactiva de la calculadora, incluyendo
+ * la adición de números, la animación de la suma, el historial, el modo oscuro
+ * persistente y la síntesis de voz.
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- 1. SELECCIÓN DE ELEMENTOS ---
     const numberInput = document.getElementById('numberInput');
