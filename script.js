@@ -1,11 +1,10 @@
 /**
- * La Calculadora de Facundo+ - Script Principal
+ * La Calculadora de Facundo+ - Script Principal (Versión con Tutor Pedagógico Experto)
  * Autor: Hector Daniel Ayuarachi Fuentes - https://codepen.io/HectorDanielAyarachiFuentes - https://github.com/HectorDanielAyarachiFuentes
  * Fecha: 2024
  * Licencia: MIT
- * Descripción: Maneja toda la lógica interactiva de la calculadora, incluyendo
- * la adición de números, la animación de la suma, el historial, el modo oscuro
- * persistente y la síntesis de voz mejorada para decimales.
+ * Descripción: La versión más avanzada de "Facu, el Guía Numérico". Ahora agrupa los ceros
+ * en su explicación para una narración más natural e inteligente.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -33,13 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let editingIndex = null;
     let procedureSteps = [];
     let currentCalculationData = null;
+    let hasExplainedPaddingZero = false;
 
     const SVG_WIDTH = 460;
     const COLUMN_WIDTH = 35;
     const END_X = SVG_WIDTH - 40;
-    const Y_START = 50;
+    
+    const Y_LABELS = 20;
+    const Y_CARRY = 40;
+    const Y_START = 70;
     const ROW_HEIGHT = 45;
-    const Y_CARRY = 25;
+
     const HISTORY_STORAGE_KEY = 'facundoCalcHistory';
     const THEME_STORAGE_KEY = 'facundoCalcTheme';
 
@@ -172,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         numbersToSum = [];
         editingIndex = null;
         currentCalculationData = null;
+        hasExplainedPaddingZero = false;
         setUIMode('input');
         renderOperands();
         setExplanation('Añade al menos dos números para empezar.');
@@ -212,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setUIMode('calculating');
         procedureSection.classList.add('hidden');
         procedureList.innerHTML = '';
+        hasExplainedPaddingZero = false;
         let calculationData;
 
         if (replayData) {
@@ -226,13 +231,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (intPart.length > maxIntLength) maxIntLength = intPart.length;
                 if (fracPart.length > maxFracLength) maxFracLength = fracPart.length;
             });
-            const paddedNumbers = numbersToSum.map(num => {
+            
+            const paddedNumbers = [];
+            const isPaddingZeroMatrix = [];
+
+            numbersToSum.forEach(num => {
                 const parts = num.split('.');
                 const intPart = parts[0] || '0';
                 const fracPart = parts[1] || '';
-                return intPart.padStart(maxIntLength, '0') + fracPart.padEnd(maxFracLength, '0');
+                
+                const paddedInt = intPart.padStart(maxIntLength, '0');
+                const paddedFrac = fracPart.padEnd(maxFracLength, '0');
+                paddedNumbers.push(paddedInt + paddedFrac);
+
+                const intPadding = Array(paddedInt.length - intPart.length).fill(true);
+                const fracPadding = Array(paddedFrac.length - fracPart.length).fill(true);
+                const originalInt = Array(intPart.length).fill(false);
+                const originalFrac = Array(fracPart.length).fill(false);
+                isPaddingZeroMatrix.push([...intPadding, ...originalInt, ...originalFrac, ...fracPadding]);
             });
-            calculationData = { paddedNumbers, decimalPosition: maxFracLength, originalNumbers: [...numbersToSum] };
+
+            calculationData = { 
+                paddedNumbers, 
+                decimalPosition: maxFracLength, 
+                originalNumbers: [...numbersToSum],
+                isPaddingZeroMatrix
+            };
             addToHistory(calculationData);
         }
 
@@ -275,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
         procedureSteps = [];
         setUIMode('result');
         svg.innerHTML = '';
+        hasExplainedPaddingZero = true;
 
         const { paddedNumbers, decimalPosition, resultString } = calcData;
         const numDigits = paddedNumbers[0].length;
@@ -408,6 +433,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const numDigits = paddedNumbers[0].length;
         const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
         svg.appendChild(createSvgElement('rect', { id: 'highlight-rect', x: -1000, y: 0, width: COLUMN_WIDTH, height: requiredHeight, class: 'highlight-rect' }));
+
+        const integerLabels = ['U', 'D', 'C', 'UM', 'DM'];
+        const decimalLabels = ['d', 'c', 'm', 'dm'];
+
+        for (let i = 0; i < numDigits; i++) {
+            const x = END_X - (i * COLUMN_WIDTH);
+            let labelText = '';
+
+            if (i < decimalPos) {
+                const decimalIndex = decimalPos - 1 - i;
+                labelText = decimalLabels[decimalIndex] || '';
+            } else {
+                const integerIndex = i - decimalPos;
+                labelText = integerLabels[integerIndex] || '';
+            }
+
+            if (labelText) {
+                svg.appendChild(createSvgElement('text', { x, y: Y_LABELS, class: 'place-value-label' }, labelText));
+            }
+        }
+
         if (paddedNumbers.length > 1) {
             const plusX = END_X - (numDigits * COLUMN_WIDTH) - (COLUMN_WIDTH * 0.5);
             const plusY = Y_START + ((paddedNumbers.length - 1) * ROW_HEIGHT);
@@ -420,7 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const x = END_X - (i * COLUMN_WIDTH);
                 const digit = numStr[numDigits - 1 - i];
                 if (decimalPos > 0 && i === decimalPos) {
-                    svg.appendChild(createSvgElement('text', { x: x + COLUMN_WIDTH / 2, y: y, class: 'decimal-point' }, '.'));
+                    svg.appendChild(createSvgElement('text', { x: x + COLUMN_WIDTH / 2, y, class: 'decimal-point' }, '.'));
                 }
                 svg.appendChild(createSvgElement('text', { x, y, class: `digit ${colorClass}` }, digit));
             }
@@ -467,12 +513,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const kidMotivations = ["Puedes brillar, ¡no importa de qué estés hecho!", "La perfección no existe, eres hermoso como eres. Con todas tus imperfecciones lograrás lo que quieras, te lo juro por Dieguito Maradona.", "¡Cada error es una oportunidad para aprender algo nuevo! ¡Sigue intentando!", "¡Eres más valiente de lo que crees y más inteligente de lo que piensas!", "¡Wow, qué bien lo estás haciendo! Cada suma te hace más fuerte.", "El secreto para salir adelante es empezar. ¡Y tú ya empezaste!"];
     const adultMotivations = ["NO ME RETES VIEJA CHOTA, NA MENTIRA XD!.", "Gracias por enseñar con paciencia. Estás construyendo la confianza de un niño, un número a la vez.", "Recuerda que el objetivo no es la respuesta correcta, sino el proceso de aprender y descubrir juntos.", "Tu apoyo y ánimo son las herramientas más importantes en este viaje de aprendizaje.", "Celebrar los pequeños logros crea grandes aprendices. ¡Sigue así!", "Enseñar es dejar una huella en el futuro. Gracias por tu dedicación."];
+    
+    const columnCompletePhrases = ["¡Perfecto!", "¡Así se hace!", "¡Muy bien!", "¡Genial!", "¡Vamos de maravilla!", "¡Eso es!"];
+    const noCarryPhrases = ["¡Estupendo! Aquí no nos llevamos nada.", "¡Fácil! Como no nos llevamos nada, pasamos a la siguiente.", "¡Bien hecho! No hay llevada, así que seguimos."];
+    const finalResultPhrases = ["¡Y lo logramos! ¡Qué gran trabajo has hecho!", "¡Misión cumplida! La suma es correcta. ¡Eres un genio de las mates!", "¡Terminamos! Y el resultado es perfecto. ¡Estoy muy orgulloso de ti!"];
 
+    function getRandomPhrase(phrases) {
+        return phrases[Math.floor(Math.random() * phrases.length)];
+    }
+    
     function leerEnVoz(texto) {
         if ('speechSynthesis' in window) {
             const utter = new SpeechSynthesisUtterance(texto);
             utter.lang = 'es-ES';
-            utter.rate = 0.9;
+            utter.rate = 1.0;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utter);
         } else {
@@ -482,79 +536,120 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function readRandomMotivation(type) {
         const phrases = type === 'kid' ? kidMotivations : adultMotivations;
-        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-        leerEnVoz(phrase);
+        leerEnVoz(getRandomPhrase(phrases));
     }
 
+    // ✅ La función de voz final, con la explicación mejorada sobre los ceros agrupados
     function setupVoiceReader() {
         if (!procedureList) return;
+
         const handleProcedureClick = (event) => {
             const listItem = event.target.closest('li');
             if (!listItem || !listItem.dataset.stepIndex) return;
+
             const stepIndex = parseInt(listItem.dataset.stepIndex, 10);
             const stepData = procedureSteps[stepIndex];
             if (!stepData) {
                 leerEnVoz(listItem.textContent);
                 return;
             }
-            let descripcion = `Columna ${stepIndex + 1}. ¡A ver qué tenemos aquí! `;
-            const numerosQueSuman = stepData.digits.filter(d => d > 0);
-            const cantidadDeCeros = stepData.digits.length - numerosQueSuman.length;
-            if (cantidadDeCeros > 0) {
-                if (cantidadDeCeros === 1) {
-                    descripcion += `Veo un cero por aquí... pero recuerda, los ceros no suman, así que no lo contamos. `;
-                } else {
-                    descripcion += `¡Mira! Hay ${numeroALetras(cantidadDeCeros)} ceros. Pero como sabes, los ceros no suman nada. `;
-                }
-            }
-            if (numerosQueSuman.length > 0) {
-                const numerosEnPalabras = numerosQueSuman.map(d => numeroALetras(d));
-                let listaDeNumeros;
-                if (numerosEnPalabras.length > 2) {
-                    const todosMenosElUltimo = numerosEnPalabras.slice(0, -1);
-                    const ultimo = numerosEnPalabras[numerosEnPalabras.length - 1];
-                    listaDeNumeros = todosMenosElUltimo.join(', ') + ' y ' + ultimo;
-                } else {
-                    listaDeNumeros = numerosEnPalabras.join(' y ');
-                }
-                descripcion += `Así que solo Sumamos ${listaDeNumeros}. `;
-            } else if (cantidadDeCeros > 0) {
-                descripcion += `Como solo hay ceros, el resultado es... ¡cero! `;
-            }
-            if (stepData.carryIn > 0) {
-                descripcion += `Ah, ¡pero no nos olvidemos de sumar el ${numeroALetras(stepData.carryIn)} que guardamos antes! `;
-            }
-            if (numerosQueSuman.length === 0 && stepData.carryIn > 0) {
-                descripcion += `Así que el total es ${numeroALetras(stepData.sum)}. `;
-            } else {
-                descripcion += `Todo eso nos da ${numeroALetras(stepData.sum)}. `;
-            }
-            descripcion += `Entonces, abajo ponemos un ${numeroALetras(stepData.resultDigit)}. `;
 
-            // ✅ NUEVO: Lógica para anunciar la coma decimal
-            // Comprueba si esta es la última columna de los decimales
-            if (currentCalculationData && currentCalculationData.decimalPosition > 0 && stepIndex === currentCalculationData.decimalPosition - 1) {
-                descripcion += `¡Perfecto! Como aquí se terminan los números decimales, ahora ponemos la coma en el resultado. La siguiente columna que sumaremos será la de las unidades. `;
+            const { decimalPosition, isPaddingZeroMatrix } = currentCalculationData || {};
+            const isDecimalColumn = decimalPosition > 0 && stepIndex < decimalPosition;
+            const numDigits = currentCalculationData.paddedNumbers[0].length;
+            const digitIndexInString = numDigits - 1 - stepIndex;
+
+            const columnNames = {
+                decimal: ["décimos", "centésimos", "milésimos", "diezmilésimos"],
+                integer: ["unidades", "decenas", "centenas", "unidades de mil", "decenas de mil"]
+            };
+
+            let columnName = "";
+            if (isDecimalColumn) {
+                const decimalIndex = decimalPosition - 1 - stepIndex;
+                columnName = columnNames.decimal[decimalIndex] || `la columna decimal ${decimalIndex + 1}`;
+            } else {
+                const integerIndex = stepIndex - (decimalPosition || 0);
+                columnName = columnNames.integer[integerIndex] || `la columna de enteros ${integerIndex + 1}`;
+            }
+            
+            let descripcion = `Vamos con la columna de las ${columnName}. `;
+            
+            // ✅ NUEVO: Lógica para agrupar ceros
+            let nonZeroDigits = [];
+            let zeroCount = 0;
+            let containsPaddingZero = false;
+
+            stepData.digits.forEach((digit, rowIndex) => {
+                if (digit === 0) {
+                    zeroCount++;
+                    const isPadding = isPaddingZeroMatrix && isPaddingZeroMatrix[rowIndex][digitIndexInString];
+                    if (isPadding) {
+                        containsPaddingZero = true;
+                    }
+                } else {
+                    nonZeroDigits.push(digit);
+                }
+            });
+
+            // --- Construcción de la narración ---
+            if (nonZeroDigits.length === 0 && stepData.carryIn === 0) {
+                descripcion += `Aquí solo hay ceros, así que el resultado es cero. ¡Sencillo! `;
+            } else {
+                if (nonZeroDigits.length > 0) {
+                    const nonZeroWords = nonZeroDigits.map(d => numeroALetras(d));
+                    descripcion += `Sumamos ${nonZeroWords.join(' más ')}. `;
+                }
+
+                if (zeroCount > 0) {
+                    if (zeroCount === 1) {
+                        descripcion += "Vemos que también hay un cero. ";
+                    } else {
+                        descripcion += `Vemos que también hay ${numeroALetras(zeroCount)} ceros. `;
+                    }
+                    descripcion += "Recuerda que, aunque los tenemos en cuenta, no suman valor a la columna. ";
+                }
+                
+                if (containsPaddingZero && !hasExplainedPaddingZero) {
+                    descripcion += `Uno de esos ceros lo pusimos nosotros para alinear los números. ¡Es una pequeña ayuda! `;
+                    hasExplainedPaddingZero = true;
+                }
+
+                if (stepData.carryIn > 0) {
+                    descripcion += `Y no olvidemos el ${numeroALetras(stepData.carryIn)} que nos estábamos llevando. `;
+                }
+
+                descripcion += `En total, la columna suma ${numeroALetras(stepData.sum)}. `;
+                descripcion += `Por lo tanto, debajo de la línea escribimos el ${numeroALetras(stepData.resultDigit)}. `;
+            }
+            
+            // --- Cierre de la narración ---
+            if (stepData.carryOut > 0) {
+                const nextColumnIndex = stepIndex - (decimalPosition || 0) + (isDecimalColumn ? 0 : 1);
+                const nextColumnName = columnNames.integer[nextColumnIndex] || "siguiente";
+                descripcion += `${getRandomPhrase(columnCompletePhrases)} Como el resultado fue mayor que nueve, nos llevamos ${numeroALetras(stepData.carryOut)} para la columna de las ${nextColumnName}. `;
+            } else if (!(nonZeroDigits.length === 0 && stepData.carryIn === 0)) {
+                 descripcion += `${getRandomPhrase(noCarryPhrases)} `;
+            }
+            
+            if (isDecimalColumn && stepIndex === decimalPosition - 1) {
+                descripcion += `¡Momento clave! Como terminamos con los decimales, ahora ponemos la coma. ¡Y seguimos con los números enteros! `;
             }
 
             if (stepIndex === procedureSteps.length - 1) {
-                if (stepData.carryOut > 0) {
-                    descripcion += `Y guardamos el ${numeroALetras(stepData.carryOut)}. Como ya no hay más columnas, lo ponemos al principio del resultado. ¡Y así terminamos la cuenta!`;
-                } else {
-                    descripcion += `¡Y como no nos sobró nada, hemos terminado la cuenta! ¡Buen trabajo!`;
+                 if (stepData.carryOut > 0) {
+                    descripcion += `Y como ya no hay más columnas, ese ${numeroALetras(stepData.carryOut)} que llevábamos lo ponemos al principio del resultado. `;
                 }
-            } else {
-                if (stepData.carryOut > 0) {
-                    descripcion += `Y guardamos el ${numeroALetras(stepData.carryOut)} para la próxima columna.`;
-                } else {
-                    descripcion += `¡Genial! No necesitamos guardar nada para la próxima columna.`;
-                }
+                descripcion += getRandomPhrase(finalResultPhrases);
             }
+
             leerEnVoz(descripcion.replace(/ +/g, ' ').trim());
         };
+
         procedureList.removeEventListener('click', handleProcedureClick);
         procedureList.addEventListener('click', handleProcedureClick);
     }
+
 
     // --- 8. LÓGICA DE TEMA OSCURO ---
     function toggleTheme() {
