@@ -612,3 +612,12 @@ body.dark-mode .footer-logo span {
 body.dark-mode .sum-line-svg {
     stroke: var(--result-dark);
 }
+/* Pega esto al final de tu archivo style.css */
+
+.place-value-label {
+    font-size: 14px;
+    font-weight: 700;
+    fill: var(--text-light);
+    text-anchor: middle;
+    font-family: var(--font-family);
+}
