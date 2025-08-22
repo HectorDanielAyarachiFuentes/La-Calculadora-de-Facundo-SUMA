@@ -1,10 +1,10 @@
 /**
- * La Calculadora de Facundo+ - Script Principal (Versión con Tutor Pedagógico Experto)
+ * La Calculadora de Facundo+ - Script Principal (Versión Final con Tutor Experto)
  * Autor: Hector Daniel Ayuarachi Fuentes - https://codepen.io/HectorDanielAyarachiFuentes - https://github.com/HectorDanielAyarachiFuentes
  * Fecha: 2024
  * Licencia: MIT
- * Descripción: La versión más avanzada de "Facu, el Guía Numérico". Ahora agrupa los ceros
- * en su explicación para una narración más natural e inteligente.
+ * Descripción: La versión definitiva de "Facu, el Guía Numérico". Perfecciona la lógica de cierre
+ * para explicar correctamente el último paso cuando hay una llevada final.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -538,8 +538,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const phrases = type === 'kid' ? kidMotivations : adultMotivations;
         leerEnVoz(getRandomPhrase(phrases));
     }
-
-    // ✅ La función de voz final, con la explicación mejorada sobre los ceros agrupados
+    
+    // ✅ NUEVO Y MEJORADO: La función final del tutor auditivo
     function setupVoiceReader() {
         if (!procedureList) return;
 
@@ -575,7 +575,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let descripcion = `Vamos con la columna de las ${columnName}. `;
             
-            // ✅ NUEVO: Lógica para agrupar ceros
             let nonZeroDigits = [];
             let zeroCount = 0;
             let containsPaddingZero = false;
@@ -591,8 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     nonZeroDigits.push(digit);
                 }
             });
-
-            // --- Construcción de la narración ---
+            
             if (nonZeroDigits.length === 0 && stepData.carryIn === 0) {
                 descripcion += `Aquí solo hay ceros, así que el resultado es cero. ¡Sencillo! `;
             } else {
@@ -602,12 +600,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (zeroCount > 0) {
-                    if (zeroCount === 1) {
-                        descripcion += "Vemos que también hay un cero. ";
-                    } else {
-                        descripcion += `Vemos que también hay ${numeroALetras(zeroCount)} ceros. `;
-                    }
-                    descripcion += "Recuerda que, aunque los tenemos en cuenta, no suman valor a la columna. ";
+                    descripcion += (zeroCount === 1) ? "Vemos que también hay un cero. " : `Vemos que también hay ${numeroALetras(zeroCount)} ceros. `;
+                    descripcion += "Recuerda que, aunque están ahí, no suman valor a la columna. ";
                 }
                 
                 if (containsPaddingZero && !hasExplainedPaddingZero) {
@@ -623,24 +617,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 descripcion += `Por lo tanto, debajo de la línea escribimos el ${numeroALetras(stepData.resultDigit)}. `;
             }
             
-            // --- Cierre de la narración ---
-            if (stepData.carryOut > 0) {
-                const nextColumnIndex = stepIndex - (decimalPosition || 0) + (isDecimalColumn ? 0 : 1);
-                const nextColumnName = columnNames.integer[nextColumnIndex] || "siguiente";
-                descripcion += `${getRandomPhrase(columnCompletePhrases)} Como el resultado fue mayor que nueve, nos llevamos ${numeroALetras(stepData.carryOut)} para la columna de las ${nextColumnName}. `;
-            } else if (!(nonZeroDigits.length === 0 && stepData.carryIn === 0)) {
-                 descripcion += `${getRandomPhrase(noCarryPhrases)} `;
+            // ✅ NUEVO Y MEJORADO: Lógica de cierre para la última columna
+            const isLastColumn = stepIndex === procedureSteps.length - 1;
+
+            if (isLastColumn) {
+                if (stepData.carryOut > 0) {
+                    descripcion += `¡Atención, este es el último paso! Como ya no hay más columnas, ese ${numeroALetras(stepData.carryOut)} que nos llevábamos baja directamente para ser el primer número de nuestra respuesta final. `;
+                }
+                descripcion += getRandomPhrase(finalResultPhrases);
+            } else {
+                // Lógica para las columnas intermedias
+                if (stepData.carryOut > 0) {
+                    const nextColumnIndex = stepIndex - (decimalPosition || 0) + (isDecimalColumn ? 0 : 1);
+                    const nextColumnName = columnNames.integer[nextColumnIndex] || "siguiente";
+                    descripcion += `${getRandomPhrase(columnCompletePhrases)} Como el resultado fue mayor que nueve, nos llevamos ${numeroALetras(stepData.carryOut)} para la columna de las ${nextColumnName}. `;
+                } else if (!(nonZeroDigits.length === 0 && stepData.carryIn === 0)) {
+                    descripcion += `${getRandomPhrase(noCarryPhrases)} `;
+                }
             }
             
             if (isDecimalColumn && stepIndex === decimalPosition - 1) {
                 descripcion += `¡Momento clave! Como terminamos con los decimales, ahora ponemos la coma. ¡Y seguimos con los números enteros! `;
-            }
-
-            if (stepIndex === procedureSteps.length - 1) {
-                 if (stepData.carryOut > 0) {
-                    descripcion += `Y como ya no hay más columnas, ese ${numeroALetras(stepData.carryOut)} que llevábamos lo ponemos al principio del resultado. `;
-                }
-                descripcion += getRandomPhrase(finalResultPhrases);
             }
 
             leerEnVoz(descripcion.replace(/ +/g, ' ').trim());
