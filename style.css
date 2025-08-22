@@ -30,7 +30,6 @@ body {
     width: 100%;
     max-width: 600px; /* Default max-width for mobile/tablet */
     transition: max-width 0.4s ease-in-out;
-    /* Flexbox to correctly stack header and layout wrapper */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -231,54 +230,44 @@ header {
 .plus-sign-svg { fill: var(--text-light); font-weight: 700; }
 .sum-line-svg { stroke: var(--result-dark); stroke-width: 2.5; }
 .highlight-rect { fill: #fff176; opacity: 0.5; transition: all 0.5s ease-in-out; }
-
+.place-value-label {
+    font-size: 14px;
+    font-weight: 700;
+    fill: var(--text-light);
+    text-anchor: middle;
+    font-family: var(--font-family);
+}
 
 /* --- LAYOUT STYLES --- */
 .calculator-layout-wrapper {
     display: flex;
-    flex-direction: column; /* Mobile-first: stacks columns */
+    flex-direction: column;
     width: 100%;
     margin-top: 1.5rem;
 }
 
-/* On mobile, reorder for better flow: main content is first */
 .main-content { order: 1; }
 #procedure-section { order: 2; }
 #history-section { order: 3; }
 
-
-/* DESKTOP: 3-Column Flexbox Layout */
 @media (min-width: 1024px) {
     .container {
-        max-width: 1200px; /* Widen container for desktop */
+        max-width: 1200px;
     }
-
     .calculator-layout-wrapper {
-        flex-direction: row; /* Switch to side-by-side columns */
+        flex-direction: row;
         align-items: flex-start;
-        gap: 3rem; /* Increased gap for better visual separation */
+        gap: 3rem;
     }
-    
-    /* Reset mobile ordering so columns appear as defined in the HTML */
     .main-content, #procedure-section, #history-section {
         order: 0;
         margin-top: 0;
     }
-
-    /* Define column sizes */
-    #procedure-section {
-        flex: 1 1 25%; /* Left column */
-    }
-    .main-content {
-        flex: 1 1 50%; /* Center column (wider) */
-    }
-    #history-section {
-        flex: 1 1 25%; /* Right column */
-    }
+    #procedure-section { flex: 1 1 25%; }
+    .main-content { flex: 1 1 50%; }
+    #history-section { flex: 1 1 25%; }
 }
 
-
-/* RESPONSIVE STYLES FOR SMALLER SCREENS */
 @media (max-width: 576px) {
     body { padding: 1rem 0.5rem; }
     .container { padding: 1.5rem 1rem; max-width: 100%; }
@@ -293,9 +282,6 @@ header {
     .btn-calculate, .btn-replay, .btn-reset { width: 100%; }
 }
 
-
-
-
 /* --- ESTILOS DEL FOOTER MOTIVACIONAL --- */
 .motivational-footer {
     width: 100%;
@@ -305,7 +291,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
+    flex-wrap: wrap;
     gap: 1rem;
 }
 
@@ -325,6 +311,7 @@ header {
 .footer-buttons {
     display: flex;
     gap: 0.75rem;
+    flex-wrap: wrap; /* Para que se adapte mejor en pantallas pequeñas */
 }
 
 .footer-btn {
@@ -337,6 +324,10 @@ header {
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
+    text-decoration: none; /* Para los <a> que parecen botones */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .footer-btn:hover {
@@ -347,74 +338,6 @@ header {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Adaptar footer para móviles */
-@media (max-width: 600px) {
-    .motivational-footer {
-        flex-direction: column;
-        justify-content: center;
-        text-align: center;
-        gap: 1.5rem;
-    }
-    .footer-buttons {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-}
-
-
-/* --- ESTILOS DEL FOOTER MOTIVACIONAL --- */
-.motivational-footer {
-    width: 100%;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--line-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
-    gap: 1rem;
-}
-
-.footer-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-weight: 700;
-    color: var(--primary-purple);
-}
-
-.logo-svg {
-    width: 40px;
-    height: 40px;
-}
-
-.footer-buttons {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.footer-btn {
-    background-color: #f1f3f5;
-    color: var(--text-light);
-    border: 1px solid var(--line-color);
-    border-radius: 8px;
-    padding: 0.6rem 1rem;
-    font-family: var(--font-family);
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.footer-btn:hover {
-    background-color: var(--primary-purple);
-    color: white;
-    border-color: var(--primary-purple);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Adaptar footer para móviles */
 @media (max-width: 600px) {
     .motivational-footer {
         flex-direction: column;
@@ -430,67 +353,28 @@ header {
 }
 
 /* --- ESTILOS DE PROCEDIMIENTO Y HISTORIAL --- */
-#procedure-section, #history-section { 
-    margin-top: 1.5rem; 
-    text-align: left; 
-}
-
-/* --- ESTA ES LA SECCIÓN MODIFICADA PARA EL SCROLL --- */
 #procedure-section {
     display: flex;
     flex-direction: column;
-    /* Establecemos una altura máxima. El contenido no podrá superar este alto. */
-    /* Este valor funciona bien en la vista de escritorio de 3 columnas. */
     max-height: 450px; 
 }
 
 #procedure-section h2, #history-section h2 { 
-    font-size: 1.2rem; 
-    color: var(--text-light); 
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-    /* Hacemos que el título no se mueva con el scroll */
     flex-shrink: 0;
 }
 
-#procedure-list, #history-list { 
-    list-style: none; 
-    padding: 0; 
-    margin: 0; 
-}
-
-/* --- ESTA ES LA SEGUNDA PARTE CLAVE PARA EL SCROLL --- */
 #procedure-list {
-    /* Si el contenido de la lista supera el espacio disponible, muestra un scroll vertical */
     overflow-y: auto; 
-    /* Pequeño padding para que el scroll no se pegue al borde */
     padding-right: 0.5rem; 
 }
 
-#procedure-list li {
-    padding: 0.5rem 0.8rem;
-    margin-bottom: 0.5rem;
-    border-radius: 6px;
-    background-color: #fff;
-    border: 1px solid #e9ecef;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    position: relative;
-}
-
-
-/* ==============================================
-   ===      ESTILOS PARA MODO OSCURO          ===
-   ============================================== */
-
-/* --- 1. Estilos para el botón de cambio de tema --- */
+/* --- ESTILOS PARA MODO OSCURO --- */
 .header-top {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    position: relative; /* Para alinear el título y el botón */
+    position: relative;
     width: 100%;
 }
 
@@ -515,109 +399,68 @@ header {
     transform: translateY(-2px) scale(1.1);
 }
 
-
-/* --- 2. Variables y estilos para el modo oscuro --- */
 body.dark-mode {
     --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #1a222a 100%);
     --container-bg: rgba(44, 62, 80, 0.9);
-    --result-dark: #ecf0f1; /* Texto claro para fondos oscuros */
+    --result-dark: #ecf0f1;
     --text-light: #95a5a6;
     --line-color: #3b5066;
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* Sobrescribir estilos de componentes específicos */
 body.dark-mode #whiteboard {
     background: #2c3e50;
     border-color: var(--line-color);
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.25);
 }
 
-body.dark-mode .operand-item:last-child::before {
-     color: var(--text-light);
-}
-
-body.dark-mode .edit-input {
-    background-color: #34495e80;
-    color: #fff;
-}
-
-body.dark-mode .delete-btn {
-    background: #5e3d43;
-    color: #ff8a80;
-}
-
-body.dark-mode #numberInput {
-    background-color: #34495e;
-    border-color: var(--line-color);
-    color: var(--result-dark);
-}
-
-body.dark-mode #numberInput::placeholder {
-    color: var(--text-light);
-}
-
-body.dark-mode #numberInput:focus {
-    border-color: var(--primary-purple);
-    box-shadow: 0 0 10px rgba(110, 72, 170, 0.4);
-}
-
-body.dark-mode #explanation-box {
-    background-color: rgba(94, 53, 177, 0.2);
-    border-left-color: #9575cd;
-}
-
-body.dark-mode #explanation-text {
-    color: #d1c4e9;
-}
-
+body.dark-mode .operand-item:last-child::before { color: var(--text-light); }
+body.dark-mode .edit-input { background-color: #34495e80; color: #fff; }
+body.dark-mode .delete-btn { background: #5e3d43; color: #ff8a80; }
+body.dark-mode #numberInput { background-color: #34495e; border-color: var(--line-color); color: var(--result-dark); }
+body.dark-mode #numberInput::placeholder { color: var(--text-light); }
+body.dark-mode #numberInput:focus { border-color: var(--primary-purple); box-shadow: 0 0 10px rgba(110, 72, 170, 0.4); }
+body.dark-mode #explanation-box { background-color: rgba(94, 53, 177, 0.2); border-left-color: #9575cd; }
+body.dark-mode #explanation-text { color: #d1c4e9; }
 body.dark-mode #procedure-list li,
-body.dark-mode #history-list li {
-    background-color: #34495e;
-    border-color: var(--line-color);
-}
-
-body.dark-mode #procedure-list li:hover {
-    background-color: rgba(110, 72, 170, 0.3);
-    border-color: var(--primary-purple);
-}
-
-body.dark-mode #history-list li:hover {
-    background-color: #4b6680;
-    border-color: var(--primary-purple);
-}
-
+body.dark-mode #history-list li { background-color: #34495e; border-color: var(--line-color); }
+body.dark-mode #procedure-list li:hover { background-color: rgba(110, 72, 170, 0.3); border-color: var(--primary-purple); }
+body.dark-mode #history-list li:hover { background-color: #4b6680; border-color: var(--primary-purple); }
 body.dark-mode .footer-btn,
-body.dark-mode .theme-btn {
-    background-color: #34495e;
-    color: var(--text-light);
-    border-color: var(--line-color);
-}
-
+body.dark-mode .theme-btn { background-color: #34495e; color: var(--text-light); border-color: var(--line-color); }
 body.dark-mode .footer-btn:hover,
-body.dark-mode .theme-btn:hover {
-    background-color: var(--primary-purple);
+body.dark-mode .theme-btn:hover { background-color: var(--primary-purple); color: white; border-color: var(--primary-purple); }
+body.dark-mode .logo-svg rect { fill: #9575cd; }
+body.dark-mode .footer-logo span { color: #b39ddb; }
+body.dark-mode .sum-line-svg { stroke: var(--result-dark); }
+body.dark-mode .place-value-label { fill: var(--text-light); }
+
+
+/* ✅ INICIO DE LA MODIFICACIÓN: ESTILOS PARA EL BOTÓN DE GITHUB */
+.github-btn {
+    gap: 0.6rem; /* Espacio entre el ícono y el texto */
+}
+
+.github-icon {
+    fill: currentColor; /* El ícono hereda el color del texto del botón */
+    transition: transform 0.3s ease;
+}
+
+.github-btn:hover .github-icon {
+    transform: scale(1.2) rotate(-15deg); /* Efecto interactivo al pasar el mouse */
+}
+
+/* Estilo específico para el hover del botón de GitHub */
+.github-btn:hover {
+    background-color: #24292e; /* Color oscuro de GitHub */
     color: white;
-    border-color: var(--primary-purple);
+    border-color: #24292e;
 }
 
-body.dark-mode .logo-svg rect {
-    fill: #9575cd;
+/* Ajuste para modo oscuro */
+body.dark-mode .github-btn:hover {
+    background-color: #f0f6fc; /* Color claro de GitHub */
+    color: #24292e;
+    border-color: #f0f6fc;
 }
-
-body.dark-mode .footer-logo span {
-    color: #b39ddb;
-}
-
-body.dark-mode .sum-line-svg {
-    stroke: var(--result-dark);
-}
-/* Pega esto al final de tu archivo style.css */
-
-.place-value-label {
-    font-size: 14px;
-    font-weight: 700;
-    fill: var(--text-light);
-    text-anchor: middle;
-    font-family: var(--font-family);
-}
+/* ✅ FIN DE LA MODIFICACIÓN */
