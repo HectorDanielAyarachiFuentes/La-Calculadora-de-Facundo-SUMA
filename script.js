@@ -5,7 +5,7 @@
  * Licencia: MIT
  * Descripción: Maneja toda la lógica interactiva de la calculadora, incluyendo
  * la adición de números, la animación de la suma, el historial, el modo oscuro
- * persistente y la síntesis de voz.
+ * persistente y la síntesis de voz mejorada para decimales.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -45,7 +45,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 3. MANEJADORES DE EVENTOS ---
     addBtn.addEventListener('click', addNumber);
-    numberInput.addEventListener('input', () => { numberInput.value = numberInput.value.replace(/[^0-9,.]/g, ''); });
+
+    numberInput.addEventListener('input', (e) => {
+        let value = e.target.value;
+        value = value.replace(/,/g, '.');
+        value = value.replace(/[^0-9.]/g, '');
+        const parts = value.split('.');
+        if (parts.length > 2) {
+            value = parts[0] + '.' + parts.slice(1).join('');
+        }
+        e.target.value = value;
+    });
+
     numberInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addNumber(); } });
     calculateBtn.addEventListener('click', () => startCalculation());
     resetBtn.addEventListener('click', resetCalculator);
@@ -259,7 +270,6 @@ document.addEventListener('DOMContentLoaded', () => {
         await performMultiLineStepByStep(paddedNumbers, decimalPos);
     }
 
-    // CORREGIDO: Esta función ya no añade un cero extra al resultado.
     function showStaticResult(calcData) {
         currentCalculationData = calcData;
         procedureSteps = [];
@@ -275,10 +285,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let carry = 0;
         let allCarries = [];
-        
+
         let sumTotal = BigInt(0);
         paddedNumbers.forEach(num => sumTotal += BigInt(num));
-        let fullResultWithCarry = sumTotal.toString(); // Corrección aplicada aquí
+        let fullResultWithCarry = sumTotal.toString().padStart(paddedNumbers[0].length, '0');
 
         for (let i = 0; i < numDigits; i++) {
             const digitIndex = numDigits - 1 - i;
@@ -296,8 +306,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        for (let i = 0; i < fullResultWithCarry.length; i++) {
-            const digit = fullResultWithCarry[fullResultWithCarry.length - 1 - i];
+        const resultWithPadding = resultString.replace('.', '').padStart(fullResultWithCarry.length, '0');
+
+        for (let i = 0; i < resultWithPadding.length; i++) {
+            const digit = resultWithPadding[resultWithPadding.length - 1 - i];
             const x = END_X - (i * COLUMN_WIDTH);
             svg.appendChild(createSvgElement('text', { x, y: Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT, class: 'digit result-text' }, digit));
         }
@@ -518,6 +530,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 descripcion += `Todo eso nos da ${numeroALetras(stepData.sum)}. `;
             }
             descripcion += `Entonces, abajo ponemos un ${numeroALetras(stepData.resultDigit)}. `;
+
+            // ✅ NUEVO: Lógica para anunciar la coma decimal
+            // Comprueba si esta es la última columna de los decimales
+            if (currentCalculationData && currentCalculationData.decimalPosition > 0 && stepIndex === currentCalculationData.decimalPosition - 1) {
+                descripcion += `¡Perfecto! Como aquí se terminan los números decimales, ahora ponemos la coma en el resultado. La siguiente columna que sumaremos será la de las unidades. `;
+            }
+
             if (stepIndex === procedureSteps.length - 1) {
                 if (stepData.carryOut > 0) {
                     descripcion += `Y guardamos el ${numeroALetras(stepData.carryOut)}. Como ya no hay más columnas, lo ponemos al principio del resultado. ¡Y así terminamos la cuenta!`;
