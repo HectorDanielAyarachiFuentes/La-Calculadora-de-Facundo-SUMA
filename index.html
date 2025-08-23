@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> La Calculadora de Facundo+</title>
+    <title>La Calculadora de Facundo+</title>
 
     
     <!-- Descripción general para motores de búsqueda (SEO) -->
@@ -24,16 +24,21 @@
     <meta name="twitter:title" content="Calculadora Facundo+ | Suma Visual e Interactiva">
     <meta name="twitter:description" content="Una herramienta educativa para aprender a sumar de forma visual, ideal para niños y para quienes enseñan.">
     <meta name="twitter:image" content="https://raw.githubusercontent.com/HectorDanielAyarachiFuentes/La-Calculadora-de-Facundo-SUMA/main/img/image.jpg">
-    <!-- <meta name="twitter:creator" content="@tuUsuarioDeX"> -->
     
-
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- ✅ CORRECCIÓN 1: Color del favicon arreglado -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%236e48aa'/><circle cx='8' cy='10' r='2.5' fill='%23fd7e14'/><circle cx='14' cy='10' r='2.5' fill='%23fd7e14'/><circle cx='20' cy='10' r='2.5' fill='%23fd7e14'/><circle cx='26' cy='10' r='2.5' fill='%23fd7e14'/><circle cx='8' cy='22' r='2.5' fill='%2328a745'/><circle cx='14' cy='22' r='2.5' fill='%2328a745'/><circle cx='20' cy='22' r='2.5' fill='%2328a745'/><circle cx='26' cy='22' r='2.5' fill='%2328a745'/></svg>">
 </head>
 <body>
 
+    <!-- El SDK de Facebook se mantiene aquí -->
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v18.0&appId=750701624513110&autoLogAppEvents=1" nonce="aBcDeF12"></script>
+
     <main class="container">
+        <!-- ... todo el contenido de tu calculadora ... -->
         <header>
             <div class="header-top">
                  <h1>🧮 La Calculadora de Facundo +</h1>
@@ -43,74 +48,79 @@
         </header>
 
         <div class="calculator-layout-wrapper">
-            
             <aside id="procedure-section" class="hidden">
                 <h2>Procedimiento</h2>
                 <ol id="procedure-list"></ol>
             </aside>
-            
             <div class="main-content">
                 <div id="whiteboard">
                     <div id="operands-container"></div>
                     <svg id="calculation-svg" class="hidden"></svg>
                 </div>
-        
                 <div id="input-container">
                     <div class="input-section">
                         <input type="text" id="numberInput" placeholder="Ingresa un número..." aria-label="Número para sumar">
                         <button id="addBtn" class="btn-add">Añadir</button>
                     </div>
                 </div>
-                
                 <div class="controls">
                     <button id="calculateBtn" class="btn-calculate" disabled>¡A Sumar!</button>
                     <button id="replayBtn" class="btn-replay hidden">Repetir Animación</button>
                     <button id="resetBtn" class="btn-reset">Nueva Suma</button>
                 </div>
-                
                 <div id="explanation-box">
                     <p id="explanation-text">Añade al menos dos números para empezar.</p>
                 </div>
             </div>
-
             <aside id="history-section" class="hidden">
                 <h2>Historial de Sumas</h2>
                 <ul id="history-list"></ul>
             </aside>
         </div>
 
-            <!-- ✅ INICIO DE LA MODIFICACIÓN: FOOTER CON BOTÓN DE GITHUB -->
         <footer class="motivational-footer">
             <div class="footer-logo">
-                 <svg class="logo-svg" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>
-                    <rect width='32' height='32' rx='6' fill='#6e48aa'/>
-                    <circle cx='8' cy='10' r='2.5' fill='#fd7e14'/>
-                    <circle cx='14' cy='10' r='2.5' fill='#fd7e14'/>
-                    <circle cx='20' cy='10' r='2.5' fill='#fd7e14'/>
-                    <circle cx='26' cy='10' r='2.5' fill='#fd7e14'/>
-                    <circle cx='8' cy='22' r='2.5' fill='#28a745'/>
-                    <circle cx='14' cy='22' r='2.5' fill='#28a745'/>
-                    <circle cx='20' cy='22' r='2.5' fill='#28a745'/>
-                    <circle cx='26' cy='22' r='2.5' fill='#28a745'/>
-                </svg>
+                 <svg class="logo-svg" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='#6e48aa'/><circle cx='8' cy='10' r='2.5' fill='#fd7e14'/><circle cx='14' cy='10' r='2.5' fill='#fd7e14'/><circle cx='20' cy='10' r='2.5' fill='#fd7e14'/><circle cx='26' cy='10' r='2.5' fill='#fd7e14'/><circle cx='8' cy='22' r='2.5' fill='#28a745'/><circle cx='14' cy='22' r='2.5' fill='#28a745'/><circle cx='20' cy='22' r='2.5' fill='#28a745'/><circle cx='26' cy='22' r='2.5' fill='#28a745'/></svg>
                  <span>La Calculadora de Facundo</span>
             </div>
             <div class="footer-buttons">
                 <button id="motivationForKid" class="footer-btn">✨ Para el niño</button>
                 <button id="motivationForAdult" class="footer-btn">❤️ Para quien enseña</button>
-                <!-- BOTÓN DE GITHUB AÑADIDO -->
                 <a href="https://github.com/HectorDanielAyarachiFuentes" target="_blank" rel="noopener noreferrer" class="footer-btn github-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true">
-  <path d="M8 0C3.58 0 0 3.58 0 8a8.01 8.01 0 005.47 7.59c.4.08.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.06-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21-.15.46-.55.38A8.01 8.01 0 008 0z"/>
-</svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true" class="github-icon"><path d="M8 0C3.58 0 0 3.58 0 8a8.01 8.01 0 005.47 7.59c.4.08.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.06-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21-.15.46-.55.38A8.01 8.01 0 008 0z"/></svg>
                     <span>Mi GitHub</span>
                 </a>
+                
+                <!-- ✅ CORRECCIÓN 2: Reemplazamos el botón de FB por uno personalizado -->
+                <button id="custom-fb-share-btn" class="footer-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 8px;">
+                        <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
+                    </svg>
+                    <span>Compartir</span>
+                </button>
             </div>
         </footer>
-        <!-- ✅ FIN DE LA MODIFICACIÓN -->
-
     </main>
-
+    
     <script src="script.js"></script>
+
+    <!-- ✅ CORRECCIÓN 3: Script para activar nuestro botón personalizado -->
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: '750701624513110', // Tu App ID
+                xfbml: true,
+                version: 'v18.0'
+            });
+        };
+
+        // Activar el botón personalizado
+        document.getElementById('custom-fb-share-btn').onclick = function() {
+            FB.ui({
+                method: 'share',
+                href: 'https://hectordanielayarachifuentes.github.io/La-Calculadora-de-Facundo-SUMA/',
+            }, function(response){});
+        }
+    </script>
 </body>
 </html>
