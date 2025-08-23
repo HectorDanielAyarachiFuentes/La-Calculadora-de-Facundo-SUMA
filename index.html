@@ -4,6 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora Facundo+</title>
+
+    <!-- ✅ INICIO DE LA MODIFICACIÓN: METAETIQUETAS PARA SEO Y REDES SOCIALES -->
+    
+    <!-- Descripción general para motores de búsqueda (SEO) -->
+    <meta name="description" content="Una herramienta educativa para aprender a sumar de forma visual. Ideal para niños y para quienes enseñan. ¡Descubre el procedimiento paso a paso y disfruta de las animaciones interactivas!">
+    <meta name="author" content="HectorDanielAyarachiFuentes">
+
+    <!-- Metaetiquetas de Open Graph (para Facebook, LinkedIn, etc.) -->
+    <meta property="og:title" content="Calculadora Facundo+ | Suma Visual e Interactiva">
+    <meta property="og:description" content="Una herramienta educativa para aprender a sumar de forma visual, ideal para niños y para quienes enseñan.">
+    <meta property="og:type" content="website">
+    <!-- IMPORTANTE: Reemplaza la siguiente URL con la dirección final donde alojarás tu proyecto -->
+    <meta property="og:url" content="https://github.com/HectorDanielAyarachiFuentes/La-Calculadora-de-Facundo-SUMA">
+    <!-- IMPORTANTE: Reemplaza la siguiente URL por un enlace a una imagen de previsualización (formato recomendado: 1200x630px) -->
+    <meta property="og:image" content="https://URL_DE_TU_IMAGEN_DE_PREVISUALIZACION.jpg">
+    <meta property="og:image:alt" content="Vista previa de la Calculadora de Facundo+ mostrando una suma animada.">
+
+    <!-- Metaetiquetas para Tarjetas de X (antes Twitter) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Calculadora Facundo+ | Suma Visual e Interactiva">
+    <meta name="twitter:description" content="Una herramienta educativa para aprender a sumar de forma visual, ideal para niños y para quienes enseñan.">
+    <!-- IMPORTANTE: Reemplaza la siguiente URL con la misma imagen de previsualización que usaste para og:image -->
+    <meta name="twitter:image" content="https://URL_DE_TU_IMAGEN_DE_PREVISUALIZACION.jpg">
+    <!-- Opcional: Si tienes un usuario en X, puedes añadirlo aquí -->
+    <!-- <meta name="twitter:creator" content="@tuUsuarioDeX"> -->
+    
+    <!-- ✅ FIN DE LA MODIFICACIÓN -->
+
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%236e48aa'/><circle cx='8' cy='10' r='2.5' fill='%23fd7e14'/><circle cx='14' cy='10' r='2.5' fill='%23fd7e14'/><circle cx='20' cy='10' r='2.5' fill='%23fd7e14'/><circle cx='26' cy='10' r='2.5' fill='%23fd7e14'/><circle cx='8' cy='22' r='2.5' fill='%2328a745'/><circle cx='14' cy='22' r='2.5' fill='%2328a745'/><circle cx='20' cy='22' r='2.5' fill='%2328a745'/><circle cx='26' cy='22' r='2.5' fill='%2328a745'/></svg>">
@@ -11,16 +39,13 @@
 <body>
 
     <main class="container">
-               <!-- En HTML, reemplaza tu <header> existente con este -->
         <header>
             <div class="header-top">
                  <h1>🧮 La Calculadora de Facundo +</h1>
-                 <!-- =========== NUEVO BOTÓN DE MODO OSCURO =========== -->
                  <button id="theme-toggle-btn" class="theme-btn" aria-label="Cambiar tema">🌙</button>
             </div>
             <p class="subtitle">Una experiencia de suma visual e interactiva.</p>
         </header>
-        <!-- ======================================================== -->
 
         <div class="calculator-layout-wrapper">
             
@@ -59,10 +84,8 @@
             </aside>
         </div>
 
-               <!-- =========== NUEVO FOOTER MOTIVACIONAL (CORREGIDO) =========== -->
         <footer class="motivational-footer">
             <div class="footer-logo">
-                 <!-- AQUÍ ESTÁ EL CAMBIO: Se reemplazó %23 por # en todos los "fill" -->
                  <svg class="logo-svg" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>
                     <rect width='32' height='32' rx='6' fill='#6e48aa'/>
                     <circle cx='8' cy='10' r='2.5' fill='#fd7e14'/>
@@ -79,10 +102,14 @@
             <div class="footer-buttons">
                 <button id="motivationForKid" class="footer-btn">✨ Para el niño</button>
                 <button id="motivationForAdult" class="footer-btn">❤️ Para quien enseña</button>
+                <a href="https://github.com/HectorDanielAyarachiFuentes" target="_blank" rel="noopener noreferrer" class="footer-btn github-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true" class="github-icon">
+                        <path d="M8 0C3.58 0 0 3.58 0 8a8.01 8.01 0 005.47 7.59c.4.08.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.06-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21-.15.46-.55.38A8.01 8.01 0 008 0z"/>
+                    </svg>
+                    <span>Mi GitHub</span>
+                </a>
             </div>
         </footer>
-        <!-- ========================================================== -->
-
     </main>
 
     <script src="script.js"></script>
