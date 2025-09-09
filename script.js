@@ -686,3 +686,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     init();
 });
+
+// Manejo del botón de compartir de Facebook
+window.fbAsyncInit = function() {
+    FB.init({
+        appId: '750701624513110', // Tu App ID
+        xfbml: true,
+        version: 'v18.0'
+    });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const customFbShareBtn = document.getElementById('custom-fb-share-btn');
+    if (customFbShareBtn) {
+        customFbShareBtn.onclick = function() {
+            FB.ui({
+                method: 'share',
+                href: 'https://hectordanielayarachifuentes.github.io/La-Calculadora-de-Facundo-SUMA/',
+            }, function(response){});
+        }
+    }
+});
