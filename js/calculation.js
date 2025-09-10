@@ -90,6 +90,7 @@ export async function startCalculation(numbersToSum, replayData = null) {
     setUIMode('result');
     renderProcedure();
     setupVoiceReaderForCurrentCalculation();
+    setupProcedureHover();
 }
 
 /**
@@ -257,6 +258,7 @@ export function showStaticResult(calcData) {
     setExplanation(`Mostrando el resultado de la suma: ${resultString.replace('.', ',')}.`);
     renderProcedure();
     setupVoiceReaderForCurrentCalculation();
+    setupProcedureHover();
 }
 
 
