@@ -326,6 +326,8 @@ export function renderProcedure() {
 
     procedureSteps.forEach((step, index) => {
         const li = document.createElement('li');
+        li.className = 'anim-pop-in';
+        li.style.animationDelay = `${index * 50}ms`; // Retraso escalonado
         li.dataset.stepIndex = step.stepIndex;
         let explanation = `<strong>Paso ${index + 1}:</strong> `;
 

@@ -60,7 +60,8 @@ export function renderOperands(handleSaveEditCallback, handleDeleteNumberCallbac
 
     UIState.numbersToSum.forEach((num, index) => {
         const item = document.createElement('div');
-        item.className = 'operand-item';
+        item.className = 'operand-item anim-pop-in';
+        item.style.animationDelay = `${index * 50}ms`; // Retraso escalonado
         const deleteButtonHTML = `<button class="delete-btn" data-index="${index}">×</button>`;
         if (index === UIState.editingIndex) {
             item.innerHTML = `<input type="text" class="edit-input" value="${num.replace('.', ',')}" /> ${deleteButtonHTML}`;
