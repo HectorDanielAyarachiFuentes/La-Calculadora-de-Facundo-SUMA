@@ -54,7 +54,7 @@
             </aside>
             <div class="main-content">
                 <div id="whiteboard">
-                    <div id="operands-container"></div>
+                    <div id="operands-container" role="region" aria-label="Operandos de la suma" aria-live="polite"></div>
                     <svg id="calculation-svg" class="hidden"></svg>
                 </div>
                 <div id="input-container">
@@ -68,7 +68,7 @@
                     <button id="replayBtn" class="btn-replay hidden">Repetir Animación</button>
                     <button id="resetBtn" class="btn-reset">Nueva Suma</button>
                 </div>
-                <div id="explanation-box">
+                <div id="explanation-box" role="status" aria-live="polite">
                     <p id="explanation-text">Añade al menos dos números para empezar.</p>
                 </div>
             </div>

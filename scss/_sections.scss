@@ -61,24 +61,16 @@
     cursor: pointer;
     transition: background-color $transition-fast, border-color $transition-fast, transform $transition-fast;
     position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     animation: pop-in 0.4s ease-out forwards;
     opacity: 0;
-    &::after {
-        content: '🔊';
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        opacity: 0.5;
-        font-size: 1.2rem;
-    }
+
     &:hover {
         background-color: rgba($primary-purple, 0.1);
         border-color: $primary-purple;
         transform: scale(1.02);
-        &::after {
-            opacity: 1;
-        }
     }
 
     // Animación de entrada escalonada para los primeros 15 elementos
@@ -89,6 +81,20 @@
     }
 }
 
+.procedure-text {
+    flex-grow: 1;
+}
+
+.speaker-icon {
+    opacity: 0.6;
+    font-size: 1.2rem;
+    padding-left: 0.5rem; // Espacio entre texto e ícono
+    transition: opacity $transition-fast;
+}
+
+#procedure-list li:hover .speaker-icon {
+    opacity: 1;
+}
 
 #history-list li {
     background: #f1f3f5;

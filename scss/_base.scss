@@ -18,6 +18,15 @@ body {
     display: none !important;
 }
 
+// Estilos de foco visibles para mejorar la accesibilidad del teclado
+:focus-visible {
+    outline: 3px solid $primary-purple;
+    outline-offset: 2px;
+    box-shadow: 0 0 10px rgba($primary-purple, 0.5);
+    border-radius: 4px; // Unifica el radio del borde del outline
+}
+
+
 // Keyframes para la animación de entrada
 @keyframes pop-in {
     0% {

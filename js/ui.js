@@ -227,6 +227,17 @@ export function setupUIEventListeners(callbacks) {
         }
     });
 
+    // Añadir soporte de teclado para la lista de historial
+    Elements.historyList.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            const li = e.target.closest('li[role="button"]');
+            if (li) {
+                e.preventDefault(); // Evita el scroll de la página con la barra espaciadora
+                li.click(); // Simula un clic para reutilizar la lógica existente
+            }
+        }
+    });
+
     Elements.operandsContainer.addEventListener('click', (e) => {
         if (Elements.calculateBtn.disabled && UIState.editingIndex === null) return;
         if (e.target.classList.contains('delete-btn')) callbacks.deleteNumberHandler(e.target.dataset.index);

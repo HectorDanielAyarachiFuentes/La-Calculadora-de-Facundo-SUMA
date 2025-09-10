@@ -83,16 +83,27 @@ let currentlySpeakingItem = null;
  */
 export function setupVoiceReader(procedureSteps, currentCalculationData, hasExplainedPaddingZero, setHasExplainedPaddingZero, getColumnaName) {
     if (!Elements.procedureList) return;
-
-    // Eliminar el manejador de eventos anterior para evitar duplicados
+    
+    // Eliminar los manejadores de eventos anteriores para evitar duplicados
     if (currentProcedureClickHandler) {
         Elements.procedureList.removeEventListener('click', currentProcedureClickHandler);
+        Elements.procedureList.removeEventListener('keydown', currentProcedureClickHandler);
     }
 
     // Definir el nuevo manejador de eventos
-    currentProcedureClickHandler = (event) => {
-        const listItem = event.target.closest('li');
-        if (!listItem || !listItem.dataset.stepIndex) return;
+    currentProcedureClickHandler = (event) => { // Reutilizamos la variable para poder limpiarla después
+        // Solo reaccionar a click, o a las teclas Enter/Espacio
+        if (event.type !== 'click' && (event.key !== 'Enter' && event.key !== ' ')) {
+            return;
+        }
+
+        const listItem = event.target.closest('li[role="button"]');
+        if (!listItem) return;
+
+        // Prevenir el scroll de la página al presionar Espacio y que se active dos veces
+        if (event.type === 'keydown') {
+            event.preventDefault();
+        }
 
         // Si se hace clic en el mismo elemento que se está reproduciendo, detener la voz.
         if (window.speechSynthesis.speaking && currentlySpeakingItem === listItem) {
@@ -100,11 +111,13 @@ export function setupVoiceReader(procedureSteps, currentCalculationData, hasExpl
             currentlySpeakingItem = null;
             return;
         }
+        
+        const textToReadFromDOM = listItem.querySelector('.procedure-text')?.textContent || listItem.textContent;
 
         const stepIndex = parseInt(listItem.dataset.stepIndex, 10);
         const stepData = procedureSteps.find(s => s.stepIndex === stepIndex); // Buscar por stepIndex real
         if (!stepData) {
-            leerEnVoz(listItem.textContent);
+            leerEnVoz(textToReadFromDOM);
             return;
         }
 
@@ -207,4 +220,5 @@ export function setupVoiceReader(procedureSteps, currentCalculationData, hasExpl
 
     // Añadir el nuevo manejador de eventos
     Elements.procedureList.addEventListener('click', currentProcedureClickHandler);
+    Elements.procedureList.addEventListener('keydown', currentProcedureClickHandler);
 }
