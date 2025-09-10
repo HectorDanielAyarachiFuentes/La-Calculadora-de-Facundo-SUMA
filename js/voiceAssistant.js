@@ -69,6 +69,9 @@ export const columnNames = {
     integer: ["unidades", "decenas", "centenas", "unidades de mil", "decenas de mil"]
 };
 
+// --- Estado del lector de voz ---
+let currentProcedureClickHandler = null;
+let currentlySpeakingItem = null;
 
 /**
  * Configura el tutor de voz para leer los pasos del procedimiento al hacer clic.
@@ -81,9 +84,22 @@ export const columnNames = {
 export function setupVoiceReader(procedureSteps, currentCalculationData, hasExplainedPaddingZero, setHasExplainedPaddingZero, getColumnaName) {
     if (!Elements.procedureList) return;
 
-    const handleProcedureClick = (event) => {
+    // Eliminar el manejador de eventos anterior para evitar duplicados
+    if (currentProcedureClickHandler) {
+        Elements.procedureList.removeEventListener('click', currentProcedureClickHandler);
+    }
+
+    // Definir el nuevo manejador de eventos
+    currentProcedureClickHandler = (event) => {
         const listItem = event.target.closest('li');
         if (!listItem || !listItem.dataset.stepIndex) return;
+
+        // Si se hace clic en el mismo elemento que se está reproduciendo, detener la voz.
+        if (window.speechSynthesis.speaking && currentlySpeakingItem === listItem) {
+            window.speechSynthesis.cancel();
+            currentlySpeakingItem = null;
+            return;
+        }
 
         const stepIndex = parseInt(listItem.dataset.stepIndex, 10);
         const stepData = procedureSteps.find(s => s.stepIndex === stepIndex); // Buscar por stepIndex real
@@ -185,9 +201,10 @@ export function setupVoiceReader(procedureSteps, currentCalculationData, hasExpl
             }
         }
 
+        currentlySpeakingItem = listItem; // Marcar este elemento como el que se está reproduciendo
         leerEnVoz(descripcion.replace(/ +/g, ' ').trim());
     };
 
-    Elements.procedureList.removeEventListener('click', handleProcedureClick);
-    Elements.procedureList.addEventListener('click', handleProcedureClick);
+    // Añadir el nuevo manejador de eventos
+    Elements.procedureList.addEventListener('click', currentProcedureClickHandler);
 }
