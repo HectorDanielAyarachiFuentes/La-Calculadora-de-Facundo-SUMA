@@ -1,6 +1,7 @@
 // scss/_dark-mode.scss
 
-@import 'variables';
+@use "sass:color";
+@use 'variables' as *;
 
 body.dark-mode {
     background-image: $bg-gradient-dark;
@@ -57,7 +58,7 @@ body.dark-mode {
     }
 
     .btn-calculate:disabled {
-        background-color: darken($primary-green, 15%);
+        background-color: color.adjust($primary-green, $lightness: -15%);
     }
 
     #explanation-box {
@@ -104,9 +105,9 @@ body.dark-mode {
     }
 
     .footer-logo {
-        color: lighten($primary-purple, 15%);
+        color: color.adjust($primary-purple, $lightness: 15%);
         .logo-svg rect {
-            fill: lighten($primary-purple, 15%);
+            fill: color.adjust($primary-purple, $lightness: 15%);
         }
     }
 
@@ -127,8 +128,8 @@ body.dark-mode {
     }
 
     .github-btn:hover {
-        background-color: darken(#24292e, 5%); // Darken GitHub's own dark color
+        background-color: color.adjust(#24292e, $lightness: -5%); // Darken GitHub's own dark color
         color: white;
-        border-color: darken(#24292e, 5%);
+        border-color: color.adjust(#24292e, $lightness: -5%);
     }
 }

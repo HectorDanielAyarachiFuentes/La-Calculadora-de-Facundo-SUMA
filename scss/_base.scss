@@ -1,6 +1,6 @@
 // scss/_base.scss
 
-@import 'variables'; // Importa las variables
+@use 'variables' as *; // Importa las variables
 
 body {
     font-family: $font-family-primary;

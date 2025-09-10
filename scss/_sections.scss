@@ -1,6 +1,7 @@
 // scss/_sections.scss
 
-@import 'variables';
+@use "sass:color";
+@use 'variables' as *;
 
 #explanation-box {
     background-color: $explanation-bg-light;
@@ -87,7 +88,7 @@
     transition: $transition-fast;
     border: 1px solid transparent;
     &:hover {
-        background-color: lighten($line-color, 5%);
+        background-color: color.adjust($line-color, $lightness: 5%);
         border-color: $primary-purple;
     }
 }

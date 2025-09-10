@@ -1,6 +1,6 @@
 // scss/_layout.scss
 
-@import 'variables'; // Importa las variables
+@use 'variables' as *; // Importa las variables
 
 .container {
     background: $container-bg-light;

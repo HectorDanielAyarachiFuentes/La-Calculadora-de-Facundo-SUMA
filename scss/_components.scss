@@ -1,6 +1,7 @@
 // scss/_components.scss
 
-@import 'variables';
+@use "sass:color";
+@use 'variables' as *;
 
 // Whiteboard
 #whiteboard {
@@ -139,7 +140,7 @@
     background-color: $primary-green;
     color: white;
     &:disabled {
-        background-color: lighten($primary-green, 20%);
+        background-color: color.adjust($primary-green, $lightness: 20%);
         cursor: not-allowed;
         transform: none;
         box-shadow: none;

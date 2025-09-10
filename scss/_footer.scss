@@ -1,6 +1,6 @@
 // scss/_footer.scss
 
-@import 'variables';
+@use 'variables' as *;
 
 .motivational-footer {
     width: 100%;

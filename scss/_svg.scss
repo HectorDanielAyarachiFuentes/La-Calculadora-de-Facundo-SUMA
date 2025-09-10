@@ -1,6 +1,6 @@
 // scss/_svg.scss
 
-@import 'variables';
+@use 'variables' as *;
 
 #calculation-svg {
     width: 100%;
