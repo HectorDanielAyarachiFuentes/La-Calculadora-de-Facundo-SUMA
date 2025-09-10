@@ -73,7 +73,7 @@ header {
 
 .subtitle {
     margin: .2rem 0 1.5rem;
-    color: #6c757d
+    color: #5a6268
 }
 
 .input-section {
@@ -893,7 +893,7 @@ body.dark-mode #numberInput:focus {
 }
 
 body.dark-mode .btn-calculate:disabled {
-    background-color: #19692c
+    background-color: #3a6344
 }
 
 body.dark-mode #explanation-box {
