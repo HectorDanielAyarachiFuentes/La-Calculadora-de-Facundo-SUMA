@@ -1,0 +1,93 @@
+// scss/_footer.scss
+
+@import 'variables';
+
+.motivational-footer {
+    width: 100%;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid $line-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    transition: border-color $transition-medium;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+    color: $primary-purple;
+    transition: color $transition-medium;
+}
+
+.logo-svg {
+    width: 40px;
+    height: 40px;
+    rect {
+        fill: $primary-purple; // Para el modo claro, el logo tiene el color principal
+        transition: fill $transition-medium;
+    }
+}
+
+.footer-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.footer-btn {
+    background-color: #f1f3f5;
+    color: $text-light;
+    border: 1px solid $line-color;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-family: $font-family-primary;
+    font-weight: 700;
+    cursor: pointer;
+    transition: $transition-medium;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    &:hover {
+        background-color: $primary-purple;
+        color: white;
+        border-color: $primary-purple;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.github-btn {
+    gap: 0.6rem;
+    .github-icon {
+        fill: currentColor;
+        transition: transform 0.3s ease;
+    }
+    &:hover .github-icon {
+        transform: scale(1.2) rotate(-15deg);
+    }
+    &:hover {
+        background-color: #24292e;
+        color: white;
+        border-color: #24292e;
+    }
+}
+
+
+@media (max-width: $breakpoint-mobile) {
+    .motivational-footer {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    .footer-buttons {
+        width: 100%;
+        flex-direction: column;
+    }
+}

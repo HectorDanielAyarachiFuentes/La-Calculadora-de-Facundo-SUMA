@@ -1,0 +1,190 @@
+// scss/_components.scss
+
+@import 'variables';
+
+// Whiteboard
+#whiteboard {
+    background: $whiteboard-bg-light;
+    border: 1px solid $line-color;
+    border-radius: 12px;
+    min-height: 200px;
+    margin-bottom: 1.5rem;
+    padding: 20px;
+    position: relative;
+    font-size: 2.2rem;
+    font-weight: 700;
+    box-shadow: $whiteboard-inset-shadow-light;
+    transition: background $transition-medium, border-color $transition-medium, box-shadow $transition-medium;
+}
+
+#operands-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.operand-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    justify-content: flex-end;
+    font-family: $font-family-monospace;
+    animation: pop-in 0.4s ease-out;
+    &:last-child::before {
+        content: '+';
+        color: $text-light;
+        font-family: $font-family-primary;
+        font-weight: 400;
+        transition: color $transition-medium;
+    }
+    &:first-child:last-child::before,
+    &:nth-last-child(2):first-child::before {
+        content: '';
+    }
+    &:hover .delete-btn {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+.operand-text {
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: background-color $transition-fast, border-color $transition-fast;
+    &:hover {
+        background-color: #f8f9fa;
+        border-color: $line-color;
+    }
+}
+
+.edit-input {
+    font-family: $font-family-monospace;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: $result-dark;
+    text-align: right;
+    border: 2px solid $primary-purple;
+    outline: none;
+    background-color: rgba($primary-purple, 0.1);
+    border-radius: 8px;
+    padding: 0 6px;
+    flex-grow: 1;
+    width: 10px; // Permite que se expanda por flex-grow
+    transition: color $transition-medium, background-color $transition-medium, border-color $transition-medium;
+}
+
+.delete-btn {
+    background: #ffebee;
+    color: #f44336;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    opacity: 0;
+    transition: $transition-fast;
+    line-height: 24px;
+    padding: 0;
+}
+
+// Input de número
+#numberInput {
+    flex-grow: 1;
+    padding: 0.8rem 1rem;
+    border: 2px solid $line-color;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    transition: $transition-medium;
+    &:focus {
+        outline: none;
+        border-color: $primary-purple;
+        box-shadow: 0 0 10px rgba($primary-purple, 0.2);
+    }
+    &::placeholder {
+        color: $text-light;
+        transition: color $transition-medium;
+    }
+}
+
+// Botones de control
+.btn-add,
+.btn-calculate,
+.btn-reset,
+.btn-replay {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: $transition-medium;
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.btn-add {
+    background: $primary-purple;
+    color: white;
+}
+
+.btn-calculate {
+    background-color: $primary-green;
+    color: white;
+    &:disabled {
+        background-color: lighten($primary-green, 20%);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+.btn-replay {
+    background-color: $primary-purple;
+    color: white;
+}
+
+.btn-reset {
+    background-color: $text-light;
+    color: white;
+}
+
+// Botón de tema
+.theme-btn {
+    background: #f1f3f5;
+    border: 1px solid $line-color;
+    color: $result-dark;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: $transition-medium;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:hover {
+        background-color: $primary-purple;
+        color: white;
+        transform: translateY(-2px) scale(1.1);
+    }
+}
+
+// Media queries específicas de componentes
+@media (max-width: $breakpoint-mobile) {
+    #whiteboard {
+        min-height: 180px;
+        font-size: 1.8rem;
+        padding: 15px;
+    }
+    .edit-input {
+        font-size: 1.8rem;
+    }
+}

@@ -1,0 +1,83 @@
+// scss/_svg.scss
+
+@import 'variables';
+
+#calculation-svg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.digit {
+    font-size: 32px;
+    font-weight: 700;
+    text-anchor: middle;
+}
+
+.num1-text {
+    fill: #1565c0;
+}
+.num2-text {
+    fill: #00695c;
+}
+
+.carry-text {
+    fill: $carry-orange;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.result-text {
+    fill: $result-dark;
+    font-weight: 900;
+    transition: fill $transition-medium; // Transición para modo oscuro
+}
+
+.plus-sign-svg {
+    fill: $text-light;
+    font-weight: 700;
+    transition: fill $transition-medium; // Transición para modo oscuro
+}
+
+.sum-line-svg {
+    stroke: $result-dark;
+    stroke-width: 2.5;
+    transition: stroke $transition-medium; // Transición para modo oscuro
+}
+
+.highlight-rect {
+    fill: #fff176;
+    opacity: 0.5;
+    transition: $transition-slow;
+}
+
+.decimal-point {
+    fill: $result-dark;
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-anchor: middle;
+    transition: fill $transition-medium; // Transición para modo oscuro
+}
+
+.place-value-label {
+    font-size: 14px;
+    font-weight: 700;
+    fill: $text-light;
+    text-anchor: middle;
+    font-family: $font-family-primary;
+    transition: fill $transition-medium; // Transición para modo oscuro
+}
+
+@media (max-width: $breakpoint-mobile) {
+    .digit {
+        font-size: 28px;
+    }
+    .carry-text {
+        font-size: 18px;
+    }
+    .plus-sign-svg {
+        font-size: 28px;
+    }
+}

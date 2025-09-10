@@ -1,0 +1,134 @@
+// scss/_dark-mode.scss
+
+@import 'variables';
+
+body.dark-mode {
+    background-image: $bg-gradient-dark;
+    color: $text-dark-mode-primary; // Changed from $result-dark
+
+    .container {
+        background: $container-bg-dark;
+        box-shadow: $shadow-dark;
+    }
+
+    .subtitle {
+        color: $text-dark-mode-secondary; // Changed from $text-light
+    }
+
+    #whiteboard {
+        background: $whiteboard-bg-dark;
+        border-color: $line-color;
+        box-shadow: $whiteboard-inset-shadow-dark;
+    }
+
+    .operand-item {
+        &:last-child::before {
+            color: $text-dark-mode-secondary; // Changed from $text-light
+        }
+    }
+
+    .operand-text:hover {
+        background-color: rgba($line-color, 0.2);
+        border-color: $line-color;
+    }
+
+    .edit-input {
+        background-color: rgba(#34495e, 0.5);
+        color: #fff;
+        border-color: $primary-purple;
+    }
+
+    .delete-btn {
+        background: $delete-btn-bg-dark; // Changed from #5e3d43
+        color: $delete-btn-color-dark; // Changed from #ff8a80
+    }
+
+    #numberInput {
+        background-color: #34495e;
+        border-color: $line-color;
+        color: $text-dark-mode-primary; // Changed from $result-dark
+        &::placeholder {
+            color: $text-dark-mode-secondary; // Changed from $text-light
+        }
+        &:focus {
+            border-color: $primary-purple;
+            box-shadow: 0 0 10px rgba($primary-purple, 0.4);
+        }
+    }
+
+    .btn-calculate:disabled {
+        background-color: darken($primary-green, 15%);
+    }
+
+    #explanation-box {
+        background-color: $explanation-bg-dark;
+        border-left-color: $explanation-border-dark;
+    }
+
+    #explanation-text {
+        color: $explanation-text-dark;
+    }
+
+    #procedure-section h2,
+    #history-section h2 {
+        color: $text-dark-mode-secondary; // Changed from $text-light
+        border-color: $line-color;
+    }
+
+    #procedure-list li,
+    #history-list li {
+        background-color: #34495e;
+        border-color: $line-color;
+    }
+
+    #procedure-list li:hover {
+        background-color: rgba($primary-purple, 0.3);
+        border-color: $primary-purple;
+    }
+
+    #history-list li:hover {
+        background-color: #4b6680;
+        border-color: $primary-purple;
+    }
+
+    .footer-btn,
+    .theme-btn {
+        background-color: #34495e;
+        color: $text-dark-mode-secondary; // Changed from $text-light
+        border-color: $line-color;
+        &:hover {
+            background-color: $primary-purple;
+            color: white;
+            border-color: $primary-purple;
+        }
+    }
+
+    .footer-logo {
+        color: lighten($primary-purple, 15%);
+        .logo-svg rect {
+            fill: lighten($primary-purple, 15%);
+        }
+    }
+
+    .sum-line-svg {
+        stroke: $text-dark-mode-primary; // Changed from $result-dark
+    }
+
+    .place-value-label {
+        fill: $text-dark-mode-secondary; // Changed from $text-light
+    }
+    
+    .decimal-point {
+        fill: $text-dark-mode-primary; // Changed from $result-dark
+    }
+
+    .result-text {
+        fill: $strong-green; // Changed from $text-dark-mode-primary
+    }
+
+    .github-btn:hover {
+        background-color: darken(#24292e, 5%); // Darken GitHub's own dark color
+        color: white;
+        border-color: darken(#24292e, 5%);
+    }
+}

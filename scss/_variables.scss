@@ -1,0 +1,52 @@
+// scss/_variables.scss
+
+// Colores
+$primary-purple: #6e48aa;
+$primary-green: #28a745;
+$carry-orange: #fd7e14;
+$result-dark: #343a40;
+$line-color: #dee2e6;
+$text-light: #6c757d;
+
+// Gradientes
+$bg-gradient-light: linear-gradient(135deg, #f5f7fa 0%, #e3e8f0 100%);
+$bg-gradient-dark: linear-gradient(135deg, #2c3e50 0%, #1a222a 100%);
+
+// Fondos de componentes
+$container-bg-light: rgba(255, 255, 255, 0.95);
+$container-bg-dark: rgba(44, 62, 80, 0.9);
+$whiteboard-bg-light: #fff;
+$whiteboard-bg-dark: #2c3e50;
+$explanation-bg-light: #f3e5f5;
+$explanation-bg-dark: rgba(94, 53, 177, 0.2);
+$explanation-border-light: #5e35b1;
+$explanation-border-dark: #9575cd;
+$explanation-text-light: #5e35b1;
+$explanation-text-dark: #d1c4e9;
+
+// Sombras
+$shadow-light: 0 10px 30px rgba(0, 0, 0, 0.1);
+$shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.2);
+$whiteboard-inset-shadow-light: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+$whiteboard-inset-shadow-dark: inset 0 2px 10px rgba(0, 0, 0, 0.25);
+
+// Fuentes
+$font-family-primary: 'Nunito', sans-serif;
+$font-family-monospace: 'Courier New', Courier, monospace;
+
+// Breakpoints
+$breakpoint-mobile: 576px;
+$breakpoint-tablet: 768px; // Puedes añadir si lo necesitas
+$breakpoint-desktop: 1024px;
+
+// Transiciones
+$transition-fast: all 0.2s ease;
+$transition-medium: all 0.3s ease;
+$transition-slow: all 0.4s ease-in-out;
+
+// Colores para Modo Oscuro
+$text-dark-mode-primary: #e0e0e0; // Un gris claro para texto principal
+$text-dark-mode-secondary: #a0a0a0; // Un gris ligeramente más oscuro para texto secundario
+$delete-btn-bg-dark: #7f3f4f; // Un rojo más oscuro y saturado para el fondo del botón de eliminar
+$delete-btn-color-dark: #ffb3ba; // Un rojo más claro para el texto del botón de eliminar
+$strong-green: #00cc00; // A vibrant green color

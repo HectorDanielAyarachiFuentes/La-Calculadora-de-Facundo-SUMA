@@ -1,0 +1,93 @@
+// scss/_sections.scss
+
+@import 'variables';
+
+#explanation-box {
+    background-color: $explanation-bg-light;
+    border-left: 5px solid $primary-purple;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: left;
+    transition: $transition-medium;
+    margin-bottom: 1rem;
+}
+
+#explanation-text {
+    margin: 0;
+    font-size: 1rem;
+    color: $explanation-text-light;
+    transition: color $transition-medium;
+}
+
+#procedure-section,
+#history-section {
+    margin-top: 1.5rem;
+    text-align: left;
+    transition: color $transition-medium;
+}
+
+#procedure-section h2,
+#history-section h2 {
+    font-size: 1.2rem;
+    color: $text-light;
+    border-bottom: 2px solid $line-color;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    flex-shrink: 0; // Para la sección de procedimiento con scroll
+    transition: color $transition-medium, border-color $transition-medium;
+}
+
+#procedure-list,
+#history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#procedure-list {
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+#procedure-list li {
+    padding: 0.5rem 0.8rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    background-color: $whiteboard-bg-light; // Usar el mismo fondo que whiteboard
+    border: 1px solid $line-color;
+    cursor: pointer;
+    transition: $transition-fast;
+    position: relative;
+    &::after {
+        content: '🔊';
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.5;
+        font-size: 1.2rem;
+    }
+    &:hover {
+        background-color: rgba($primary-purple, 0.1);
+        border-color: $primary-purple;
+        transform: scale(1.02);
+        &::after {
+            opacity: 1;
+        }
+    }
+}
+
+
+#history-list li {
+    background: #f1f3f5;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: $transition-fast;
+    border: 1px solid transparent;
+    &:hover {
+        background-color: lighten($line-color, 5%);
+        border-color: $primary-purple;
+    }
+}
