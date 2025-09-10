@@ -329,22 +329,26 @@ export function renderProcedure() {
     procedureSteps.forEach((step, index) => {
         const li = document.createElement('li');
         li.className = 'anim-pop-in';
+        li.setAttribute('role', 'button');
+        li.setAttribute('tabindex', '0');
         li.style.animationDelay = `${index * 50}ms`; // Retraso escalonado
         li.dataset.stepIndex = step.stepIndex;
-        let explanation = `<strong>Paso ${index + 1}:</strong> `;
+        let explanationContent = `<strong>Paso ${index + 1}:</strong> `;
 
         if (step.isFinalCarry) {
-            explanation += `<strong>Llevada final:</strong> El ${step.carryIn} que nos quedaba baja directamente.`;
+            explanationContent += `<strong>Llevada final:</strong> El ${step.carryIn} que nos quedaba baja directamente.`;
         } else {
-            explanation += `Columna de las ${getColumnaName(step.stepIndex, currentCalculationData.decimalPosition)}. `;
-            explanation += `Se suma ${step.digits.join(' + ')}`;
-            if (step.carryIn > 0) explanation += ` + ${step.carryIn} (llevada)`;
-            explanation += ` = ${step.sum}.`;
-            explanation += ` Se escribe ${step.resultDigit}`;
-            if (step.carryOut > 0) explanation += ` y se lleva ${step.carryOut}`;
-            explanation += `.`;
+            explanationContent += `Columna de las ${getColumnaName(step.stepIndex, currentCalculationData.decimalPosition)}. `;
+            explanationContent += `Se suma ${step.digits.join(' + ')}`;
+            if (step.carryIn > 0) explanationContent += ` + ${step.carryIn} (llevada)`;
+            explanationContent += ` = ${step.sum}.`;
+            explanationContent += ` Se escribe ${step.resultDigit}`;
+            if (step.carryOut > 0) explanationContent += ` y se lleva ${step.carryOut}`;
+            explanationContent += `.`;
         }
-        li.innerHTML = explanation;
+
+        // La estructura interna del LI es importante para el estilo (flexbox) y para el lector de voz.
+        li.innerHTML = `<span class="procedure-text">${explanationContent}</span><span class="speaker-icon" aria-hidden="true">🔊</span>`;
         Elements.procedureList.appendChild(li);
     });
 }
