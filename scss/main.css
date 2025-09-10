@@ -165,6 +165,16 @@ header {
     width: 100%;
   }
 }
+.btn-add:active,
+.btn-calculate:active,
+.btn-reset:active,
+.btn-replay:active,
+.footer-btn:active,
+.theme-btn:active {
+  transform: translateY(1px);
+  transition-duration: 0.05s;
+}
+
 #whiteboard {
   background: #fff;
   border: 1px solid #dee2e6;

@@ -122,3 +122,20 @@ header {
         width: 100%;
     }
 }
+
+// --- MEJORA VISUAL SUGERIDA: Feedback táctil en botones ---
+// Para una mejor experiencia, añadimos un efecto cuando se hace clic en un botón.
+// Esto hace que la interfaz se sienta más receptiva y "real".
+// Nota: Idealmente, estos estilos irían en un archivo parcial para componentes (ej. _buttons.scss).
+
+.btn-add,
+.btn-calculate,
+.btn-reset,
+.btn-replay,
+.footer-btn,
+.theme-btn {
+    &:active {
+        transform: translateY(1px); // El botón se "hunde" ligeramente al ser presionado.
+        transition-duration: 0.05s; // La acción de hacer clic debe sentirse instantánea.
+    }
+}
