@@ -2,6 +2,7 @@
 
 @use "sass:color";
 @use 'variables' as *;
+@use 'mixins' as *;
 
 // Whiteboard
 #whiteboard {
@@ -56,7 +57,7 @@
     border: 1px solid transparent;
     transition: background-color $transition-fast, border-color $transition-fast;
     &:hover {
-        background-color: #f8f9fa;
+        background-color: rgba($line-color, 0.5);
         border-color: $line-color;
     }
 }
@@ -88,7 +89,7 @@
     font-weight: bold;
     cursor: pointer;
     opacity: 0;
-    transition: $transition-fast;
+    transition: opacity $transition-fast, transform $transition-fast, background-color $transition-fast, color $transition-fast;
     line-height: 24px;
     padding: 0;
 }
@@ -101,7 +102,7 @@
     border-radius: 10px;
     font-size: 1.2rem;
     font-weight: 700;
-    transition: $transition-medium;
+    transition: border-color $transition-medium, box-shadow $transition-medium, background-color $transition-medium, color $transition-medium;
     &:focus {
         outline: none;
         border-color: $primary-purple;
@@ -124,11 +125,8 @@
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    transition: $transition-medium;
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
+    transition: background-color $transition-medium, color $transition-medium, transform $transition-medium, box-shadow $transition-medium;
+    @include button-hover-effect;
 }
 
 .btn-add {

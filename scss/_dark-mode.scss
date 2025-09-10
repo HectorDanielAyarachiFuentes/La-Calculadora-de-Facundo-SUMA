@@ -58,7 +58,7 @@ body.dark-mode {
     }
 
     .btn-calculate:disabled {
-        background-color: color.adjust($primary-green, $lightness: -15%);
+        background-color: $disabled-green-dark;
     }
 
     #explanation-box {

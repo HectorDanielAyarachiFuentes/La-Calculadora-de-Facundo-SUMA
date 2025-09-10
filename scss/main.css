@@ -1,4 +1,11 @@
 @charset "UTF-8";
+/**
+ * Aplica un efecto de elevación en el hover, común para botones.
+ */
+/**
+ * Estiliza la barra de scroll para un look más integrado con el tema.
+ * Se aplica a contenedores con overflow.
+ */
 body {
   font-family: "Nunito", sans-serif;
   background-image: linear-gradient(135deg, #f5f7fa 0%, #e3e8f0 100%);
@@ -203,7 +210,7 @@ header {
   transition: background-color all 0.2s ease, border-color all 0.2s ease;
 }
 .operand-text:hover {
-  background-color: #f8f9fa;
+  background-color: rgba(222, 226, 230, 0.5);
   border-color: #dee2e6;
 }
 
@@ -234,7 +241,7 @@ header {
   font-weight: bold;
   cursor: pointer;
   opacity: 0;
-  transition: all 0.2s ease;
+  transition: opacity all 0.2s ease, transform all 0.2s ease, background-color all 0.2s ease, color all 0.2s ease;
   line-height: 24px;
   padding: 0;
 }
@@ -246,7 +253,7 @@ header {
   border-radius: 10px;
   font-size: 1.2rem;
   font-weight: 700;
-  transition: all 0.3s ease;
+  transition: border-color all 0.3s ease, box-shadow all 0.3s ease, background-color all 0.3s ease, color all 0.3s ease;
 }
 #numberInput:focus {
   outline: none;
@@ -273,7 +280,7 @@ header {
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color all 0.3s ease, color all 0.3s ease, transform all 0.3s ease, box-shadow all 0.3s ease;
 }
 .btn-add:hover,
 .btn-calculate:hover,
@@ -425,7 +432,7 @@ header {
   padding: 1rem;
   border-radius: 8px;
   text-align: left;
-  transition: all 0.3s ease;
+  transition: background-color all 0.3s ease, border-color all 0.3s ease;
   margin-bottom: 1rem;
 }
 
@@ -440,7 +447,6 @@ header {
 #history-section {
   margin-top: 1.5rem;
   text-align: left;
-  transition: color all 0.3s ease;
 }
 
 #procedure-section h2,
@@ -464,6 +470,21 @@ header {
 #procedure-list {
   overflow-y: auto;
   padding-right: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #6e48aa rgba(110, 72, 170, 0.1);
+}
+#procedure-list::-webkit-scrollbar {
+  width: 8px;
+}
+#procedure-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+#procedure-list::-webkit-scrollbar-thumb {
+  background-color: rgba(110, 72, 170, 0.5);
+  border-radius: 10px;
+}
+#procedure-list::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(110, 72, 170, 0.7);
 }
 
 #procedure-list li {
@@ -473,8 +494,10 @@ header {
   background-color: #fff;
   border: 1px solid #dee2e6;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color all 0.2s ease, border-color all 0.2s ease, transform all 0.2s ease;
   position: relative;
+  animation: pop-in 0.4s ease-out forwards;
+  opacity: 0;
 }
 #procedure-list li::after {
   content: "🔊";
@@ -493,6 +516,51 @@ header {
 #procedure-list li:hover::after {
   opacity: 1;
 }
+#procedure-list li:nth-child(1) {
+  animation-delay: 0.06s;
+}
+#procedure-list li:nth-child(2) {
+  animation-delay: 0.12s;
+}
+#procedure-list li:nth-child(3) {
+  animation-delay: 0.18s;
+}
+#procedure-list li:nth-child(4) {
+  animation-delay: 0.24s;
+}
+#procedure-list li:nth-child(5) {
+  animation-delay: 0.3s;
+}
+#procedure-list li:nth-child(6) {
+  animation-delay: 0.36s;
+}
+#procedure-list li:nth-child(7) {
+  animation-delay: 0.42s;
+}
+#procedure-list li:nth-child(8) {
+  animation-delay: 0.48s;
+}
+#procedure-list li:nth-child(9) {
+  animation-delay: 0.54s;
+}
+#procedure-list li:nth-child(10) {
+  animation-delay: 0.6s;
+}
+#procedure-list li:nth-child(11) {
+  animation-delay: 0.66s;
+}
+#procedure-list li:nth-child(12) {
+  animation-delay: 0.72s;
+}
+#procedure-list li:nth-child(13) {
+  animation-delay: 0.78s;
+}
+#procedure-list li:nth-child(14) {
+  animation-delay: 0.84s;
+}
+#procedure-list li:nth-child(15) {
+  animation-delay: 0.9s;
+}
 
 #history-list li {
   background: #f1f3f5;
@@ -500,12 +568,59 @@ header {
   border-radius: 5px;
   margin-bottom: 0.5rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color all 0.2s ease, border-color all 0.2s ease;
   border: 1px solid transparent;
+  animation: pop-in 0.4s ease-out forwards;
+  opacity: 0;
 }
 #history-list li:hover {
   background-color: rgb(236.5086206897, 238.75, 240.9913793103);
   border-color: #6e48aa;
+}
+#history-list li:nth-child(1) {
+  animation-delay: 0.06s;
+}
+#history-list li:nth-child(2) {
+  animation-delay: 0.12s;
+}
+#history-list li:nth-child(3) {
+  animation-delay: 0.18s;
+}
+#history-list li:nth-child(4) {
+  animation-delay: 0.24s;
+}
+#history-list li:nth-child(5) {
+  animation-delay: 0.3s;
+}
+#history-list li:nth-child(6) {
+  animation-delay: 0.36s;
+}
+#history-list li:nth-child(7) {
+  animation-delay: 0.42s;
+}
+#history-list li:nth-child(8) {
+  animation-delay: 0.48s;
+}
+#history-list li:nth-child(9) {
+  animation-delay: 0.54s;
+}
+#history-list li:nth-child(10) {
+  animation-delay: 0.6s;
+}
+#history-list li:nth-child(11) {
+  animation-delay: 0.66s;
+}
+#history-list li:nth-child(12) {
+  animation-delay: 0.72s;
+}
+#history-list li:nth-child(13) {
+  animation-delay: 0.78s;
+}
+#history-list li:nth-child(14) {
+  animation-delay: 0.84s;
+}
+#history-list li:nth-child(15) {
+  animation-delay: 0.9s;
 }
 
 .motivational-footer {
@@ -644,7 +759,7 @@ body.dark-mode #numberInput:focus {
   box-shadow: 0 0 10px rgba(110, 72, 170, 0.4);
 }
 body.dark-mode .btn-calculate:disabled {
-  background-color: rgb(25.2173913043, 105.2826086957, 43.5);
+  background-color: #3a6344;
 }
 body.dark-mode #explanation-box {
   background-color: rgba(94, 53, 177, 0.2);

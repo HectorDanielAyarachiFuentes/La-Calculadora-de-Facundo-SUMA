@@ -2,6 +2,7 @@
 
 @use "sass:color";
 @use 'variables' as *;
+@use 'mixins' as *;
 
 #explanation-box {
     background-color: $explanation-bg-light;
@@ -9,7 +10,7 @@
     padding: 1rem;
     border-radius: 8px;
     text-align: left;
-    transition: $transition-medium;
+    transition: background-color $transition-medium, border-color $transition-medium;
     margin-bottom: 1rem;
 }
 
@@ -24,7 +25,7 @@
 #history-section {
     margin-top: 1.5rem;
     text-align: left;
-    transition: color $transition-medium;
+    // La transición de color se maneja en los elementos hijos
 }
 
 #procedure-section h2,
@@ -48,6 +49,7 @@
 #procedure-list {
     overflow-y: auto;
     padding-right: 0.5rem;
+    @include custom-scrollbar;
 }
 
 #procedure-list li {
@@ -57,8 +59,10 @@
     background-color: $whiteboard-bg-light; // Usar el mismo fondo que whiteboard
     border: 1px solid $line-color;
     cursor: pointer;
-    transition: $transition-fast;
+    transition: background-color $transition-fast, border-color $transition-fast, transform $transition-fast;
     position: relative;
+    animation: pop-in 0.4s ease-out forwards;
+    opacity: 0;
     &::after {
         content: '🔊';
         position: absolute;
@@ -76,6 +80,13 @@
             opacity: 1;
         }
     }
+
+    // Animación de entrada escalonada para los primeros 15 elementos
+    @for $i from 1 through 15 {
+        &:nth-child(#{$i}) {
+            animation-delay: #{$i * 0.06}s;
+        }
+    }
 }
 
 
@@ -85,10 +96,19 @@
     border-radius: 5px;
     margin-bottom: 0.5rem;
     cursor: pointer;
-    transition: $transition-fast;
+    transition: background-color $transition-fast, border-color $transition-fast;
     border: 1px solid transparent;
+    animation: pop-in 0.4s ease-out forwards;
+    opacity: 0;
     &:hover {
         background-color: color.adjust($line-color, $lightness: 5%);
         border-color: $primary-purple;
+    }
+
+    // Animación de entrada escalonada para los primeros 15 elementos
+    @for $i from 1 through 15 {
+        &:nth-child(#{$i}) {
+            animation-delay: #{$i * 0.06}s;
+        }
     }
 }

@@ -1,0 +1,42 @@
+// scss/_mixins.scss
+
+@use "sass:color";
+@use 'variables' as *;
+
+/**
+ * Aplica un efecto de elevación en el hover, común para botones.
+ */
+@mixin button-hover-effect {
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/**
+ * Estiliza la barra de scroll para un look más integrado con el tema.
+ * Se aplica a contenedores con overflow.
+ */
+@mixin custom-scrollbar {
+    // Para Firefox
+    scrollbar-width: thin;
+    scrollbar-color: $primary-purple rgba($primary-purple, 0.1);
+
+    // Para Chrome, Safari y Edge
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent; // El fondo del track será el del contenedor
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba($primary-purple, 0.5);
+        border-radius: 10px;
+
+        &:hover {
+            background-color: rgba($primary-purple, 0.7);
+        }
+    }
+}
