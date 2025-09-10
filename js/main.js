@@ -62,6 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (li && li.dataset.index) {
             const index = parseInt(li.dataset.index, 10);
             uiCallbacks.historyClickHandler(index);
+
+            // ✅ MEJORA UX: Scroll automático en móvil al ver un resultado del historial.
+            if (window.innerWidth < 1024) {
+                document.getElementById('whiteboard').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
         }
     });
     Elements.operandsContainer.addEventListener('click', (e) => {
@@ -77,6 +85,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ya que necesitan acceso a `procedureSteps` que está en ese módulo.
     // Solo necesitamos asegurarnos de que `setupProcedureHover` se llame cuando sea necesario.
     // En este caso, se llama después de cada `renderProcedure` dentro de `calculation.js`.
+
+    // ✅ MEJORA UX: Scroll automático en móvil al ver un paso del procedimiento.
+    Elements.procedureList.addEventListener('click', (e) => {
+        const li = e.target.closest('li');
+        // Solo hacemos scroll si se hizo clic en un paso y estamos en móvil (ancho < 1024px).
+        if (li && window.innerWidth < 1024) {
+            document.getElementById('whiteboard').scrollIntoView({
+                behavior: 'smooth', // Animación de scroll fluida.
+                block: 'start'      // Alinea la pizarra al inicio de la pantalla.
+            });
+        }
+    });
 });
 
 // Manejo del botón de compartir de Facebook (considerar mover a un social.js si se añaden más)

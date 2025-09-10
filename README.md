@@ -37,6 +37,7 @@ A través de animaciones paso a paso y un innovador **apoyo auditivo**, esta cal
 *   **Apoyo Auditivo 🗣️:** ¡Una característica única! Cada paso del procedimiento tiene un ícono de altavoz. Al hacer clic, una voz clara lee la explicación en voz alta. Esto es ideal para reforzar el aprendizaje auditivo y para niños que están aprendiendo a leer.
 *   **Procedimiento Detallado:** Al lado de la operación, se genera una lista con la explicación textual de cada paso. El niño puede repasarla en cualquier momento para entender por qué se llegó a ese resultado.
 *   **Interfaz Amigable y Responsiva:** Con un diseño limpio, botones grandes y modo oscuro, la calculadora es fácil de usar en cualquier dispositivo, ya sea una computadora, una tablet o un teléfono móvil.
+*   **Navegación Inteligente en Móvil:** Al revisar un paso del procedimiento o una suma del historial en tu teléfono, la vista se desplaza automáticamente para que siempre veas la acción en la pizarra, mejorando la experiencia de usuario.
 *   **Soporte para Decimales:** No se limita a números enteros. La calculadora maneja sumas con decimales de forma impecable, alineando las comas y explicando el proceso correctamente.
 *   **Historial de Sumas:** Guarda las operaciones recientes para que puedas consultarlas fácilmente.
 
