@@ -128,6 +128,20 @@
     cursor: pointer;
     transition: background-color $transition-medium, color $transition-medium, transform $transition-medium, box-shadow $transition-medium;
     @include button-hover-effect;
+    
+    // Icon + text layout
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+
+    svg {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+    }
 }
 
 .btn-add {
@@ -302,38 +316,90 @@
     gap: 15px;
 }
 
+.playback-options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    margin-top: 0.5rem;
+
+    .playback-label {
+        font-weight: 700;
+        color: #5a6268;
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+    }
+}
+
 .speed-control {
     display: flex;
-    background-color: var(--container-bg, #ffffff);
+    background-color: #f8f9fa;
     border-radius: 12px;
-    padding: 0.25rem;
+    padding: 0.35rem;
     gap: 0.25rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
     align-items: center;
-    border: 1px solid var(--border-color, #e2e8f0);
+    border: 1px solid #dee2e6;
 
     .speed-btn {
         background: transparent;
         border: none;
         border-radius: 8px;
-        padding: 0.4rem 0.6rem;
+        padding: 0.5rem 0.8rem;
         cursor: pointer;
-        font-size: 1.25rem;
-        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        opacity: 0.5;
-        filter: grayscale(100%);
+        color: #5a6268;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        svg {
+            stroke: currentColor;
+            transition: all 0.3s ease;
+        }
 
         &:hover {
-            opacity: 0.9;
-            transform: scale(1.15);
+            color: #6e48aa;
+            transform: translateY(-1px);
         }
 
         &.active {
-            opacity: 1;
-            filter: grayscale(0%);
-            background-color: rgba($primary-purple, 0.15);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: #6e48aa;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             transform: scale(1.05);
+            
+            svg {
+                stroke-width: 2.5;
+            }
+        }
+    }
+}
+
+// Dark Mode Overrides para el control de velocidad
+body.dark-mode {
+    .playback-options .playback-label {
+        color: #94a3b8;
+    }
+
+    .speed-control {
+        background-color: #1e2230;
+        border-color: #3b4255;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+
+        .speed-btn {
+            color: #64748b;
+
+            &:hover {
+                color: #a855f7;
+            }
+
+            &.active {
+                color: #a855f7;
+                background-color: #2f3545;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
         }
     }
 }
@@ -344,6 +410,7 @@
     .motivational-footer,
     .controls,
     .practice-mode-control,
+    .playback-options,
     #history-section,
     #explanation-box {
         display: none !important;

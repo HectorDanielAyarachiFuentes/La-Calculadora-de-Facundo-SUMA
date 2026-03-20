@@ -45,11 +45,6 @@
             <div class="header-top">
                  <h1>🧮 La Calculadora de Facundo +</h1>
                  <div class="header-controls">
-                     <div class="speed-control" aria-label="Velocidad de Animación">
-                         <button class="speed-btn" data-speed="2.0" title="Tortuga (Lento)">🐢</button>
-                         <button class="speed-btn active" data-speed="1.0" title="Persona (Normal)">🚶</button>
-                         <button class="speed-btn" data-speed="0.25" title="Rayo (Rápido)">⚡</button>
-                     </div>
                      <button id="theme-toggle-btn" class="theme-btn" aria-label="Cambiar tema">🌙</button>
                  </div>
             </div>
@@ -66,17 +61,52 @@
                     <div id="operands-container" role="region" aria-label="Operandos de la suma" aria-live="polite"></div>
                     <svg id="calculation-svg" class="hidden"></svg>
                 </div>
+                
+                <div class="playback-options">
+                    <span class="playback-label">Velocidad:</span>
+                    <div class="speed-control" aria-label="Velocidad de Animación">
+                        <button class="speed-btn" data-speed="2.0" aria-label="Tortuga (Lento)">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="12" height="8" rx="4"/><path d="M17 14c1.7 0 3 1.3 3 3v2h-1M5 14H3v2h1"/><path d="M7 19v2M15 19v2"/><path d="M8 11v-1a2 2 0 0 1 4 0v1"/></svg>
+                        </button>
+                        <button class="speed-btn active" data-speed="1.0" aria-label="Persona (Normal)">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="m9 20 3-8 3 8M12 7v5M8 11l4-4 4 4"/></svg>
+                        </button>
+                        <button class="speed-btn" data-speed="0.25" aria-label="Rayo (Rápido)">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        </button>
+                    </div>
+                </div>
                 <div id="input-container">
                     <div class="input-section">
                         <input type="text" id="numberInput" placeholder="Ingresa un número..." aria-label="Número para sumar">
-                        <button id="addBtn" class="btn-add">Añadir</button>
+                        <button id="addBtn" class="btn-add">
+                            <!-- Plus in circle -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm4 11h-3v3c0 .55-.45 1-1 1s-1-.45-1-1v-3H8c-.55 0-1-.45-1-1s.45-1 1-1h3V8c0-.55.45-1 1-1s1 .45 1 1v3h3c.55 0 1 .45 1 1s-.45 1-1 1z"/></svg>
+                            <span>Añadir</span>
+                        </button>
                     </div>
                 </div>
                 <div class="controls">
-                    <button id="calculateBtn" class="btn-calculate" disabled>¡A Sumar!</button>
-                    <button id="replayBtn" class="btn-replay hidden">Repetir Animación</button>
-                    <button id="downloadBtn" class="btn-download hidden">📥 Descargar Suma</button>
-                    <button id="resetBtn" class="btn-reset">Nueva Suma</button>
+                    <button id="calculateBtn" class="btn-calculate" disabled>
+                        <!-- Calculator icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm4 4h-2v-2h2v2zm0-4h-2v-2h2v2zm2-5H6V6h8v2zm4 9h-2v-6h2v6zm0-8h-2V8h2v2z"/></svg>
+                        <span>¡A Sumar!</span>
+                    </button>
+                    <button id="replayBtn" class="btn-replay hidden">
+                        <!-- Replay icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                        <span>Repetir Animación</span>
+                    </button>
+                    <button id="downloadBtn" class="btn-download hidden">
+                        <!-- Download icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zm-1-4-1.41-1.41L13 12.17V4h-2v8.17L8.41 9.59 7 11l5 5 5-5z"/></svg>
+                        <span>Descargar Suma</span>
+                    </button>
+                    <button id="resetBtn" class="btn-reset">
+                        <!-- New page icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14.59 2.59 19.42 7.4A2 2 0 0 1 20 8.83V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7.17a2 2 0 0 1 1.42.59zM14 9h4.5L14 4.5V9zm-2 6h-2v-2h2zm0-4h-2V9h2z"/></svg>
+                        <span>Nueva Suma</span>
+                    </button>
                 </div>
                 <!-- Toggle Modo Práctica -->
                 <div class="practice-mode-control" style="text-align: center; margin-bottom: 2rem; margin-top: 1rem;">
