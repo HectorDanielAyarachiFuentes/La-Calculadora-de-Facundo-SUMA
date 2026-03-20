@@ -334,45 +334,51 @@
 
 .speed-control {
     display: flex;
-    background-color: #f8f9fa;
-    border-radius: 12px;
-    padding: 0.35rem;
-    gap: 0.25rem;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    background-color: #f1f3f5;
+    border-radius: 14px;
+    padding: 0.3rem;
+    gap: 0.2rem;
     align-items: center;
     border: 1px solid #dee2e6;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
 
     .speed-btn {
         background: transparent;
         border: none;
-        border-radius: 8px;
-        padding: 0.5rem 0.8rem;
+        border-radius: 10px;
+        padding: 0.4rem 0.85rem;
         cursor: pointer;
         color: #5a6268;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-size: 0.8rem;
+        font-weight: 700;
+        font-family: 'Nunito', sans-serif;
+        transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         display: flex;
-        justify-content: center;
+        flex-direction: row;
         align-items: center;
+        gap: 5px;
+        white-space: nowrap;
 
-        svg {
-            stroke: currentColor;
-            transition: all 0.3s ease;
+        .speed-emoji {
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .speed-text {
+            font-size: 0.75rem;
+            letter-spacing: 0.02em;
         }
 
         &:hover {
             color: #6e48aa;
-            transform: translateY(-1px);
+            background-color: rgba(110, 72, 170, 0.07);
         }
 
         &.active {
             color: #6e48aa;
             background-color: #ffffff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transform: scale(1.05);
-            
-            svg {
-                stroke-width: 2.5;
-            }
+            box-shadow: 0 2px 8px rgba(110, 72, 170, 0.2);
+            transform: none;
         }
     }
 }
