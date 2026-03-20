@@ -4,132 +4,166 @@
 @use 'variables' as *;
 
 body.dark-mode {
-    background-image: $bg-gradient-dark;
-    color: $text-dark-mode-primary; // Changed from $result-dark
+    background-image: linear-gradient(135deg, #1A1D27 0%, #11141D 100%);
+    color: #F8FAFC;
 
     .container {
-        background: $container-bg-dark;
-        box-shadow: $shadow-dark;
+        background: #252A36;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
     }
 
     .subtitle {
-        color: $text-dark-mode-secondary; // Changed from $text-light
+        color: #94A3B8;
     }
 
     #whiteboard {
-        background: $whiteboard-bg-dark;
-        border-color: $line-color;
-        box-shadow: $whiteboard-inset-shadow-dark;
+        background: #323846;
+        border-color: rgba(74, 222, 128, 0.5);
+        box-shadow: 0 0 15px rgba(74, 222, 128, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.3);
     }
 
     .operand-item {
         &:last-child::before {
-            color: $text-dark-mode-secondary; // Changed from $text-light
+            color: #94A3B8;
         }
     }
 
     .operand-text:hover {
-        background-color: rgba($line-color, 0.2);
-        border-color: $line-color;
+        background-color: rgba(#64748B, 0.2);
+        border-color: #64748B;
     }
 
     .edit-input {
         background-color: rgba(#34495e, 0.5);
-        color: #fff;
-        border-color: $primary-purple;
+        color: #F8FAFC;
+        border-color: #A855F7;
     }
 
     .delete-btn {
-        background: $delete-btn-bg-dark; // Changed from #5e3d43
-        color: $delete-btn-color-dark; // Changed from #ff8a80
+        background: #7f3f4f; 
+        color: #ffb3ba; 
     }
 
     #numberInput {
-        background-color: #34495e;
-        border-color: $line-color;
-        color: $text-dark-mode-primary; // Changed from $result-dark
+        background-color: #1E2230;
+        border-color: #3B4255;
+        color: #F8FAFC;
         &::placeholder {
-            color: $text-dark-mode-secondary; // Changed from $text-light
+            color: #64748B;
         }
         &:focus {
-            border-color: $primary-purple;
-            box-shadow: 0 0 10px rgba($primary-purple, 0.4);
+            border-color: #A855F7;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+        }
+    }
+    
+    // Custom button overrides for dark mode based on the new palette
+    .btn-add, .btn-replay {
+        background: linear-gradient(135deg, #A855F7, #7E22CE);
+        color: white;
+        border: none;
+    }
+
+    .btn-calculate {
+        background: linear-gradient(135deg, #4ADE80, #16A34A);
+        color: white;
+        border: none;
+        box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+        &:disabled {
+            background: #2A3833;
+            color: #4B6358;
+            box-shadow: none;
         }
     }
 
-    .btn-calculate:disabled {
-        background-color: $disabled-green-dark;
+    .btn-reset {
+        background: linear-gradient(135deg, #64748B, #475569);
+        color: white;
+        border: none;
     }
 
     #explanation-box {
-        background-color: $explanation-bg-dark;
-        border-left-color: $explanation-border-dark;
+        background-color: #2F3545;
+        border-left-color: #A855F7;
     }
 
     #explanation-text {
-        color: $explanation-text-dark;
+        color: #94A3B8;
     }
 
     #procedure-section h2,
     #history-section h2 {
-        color: $text-dark-mode-secondary; // Changed from $text-light
-        border-color: $line-color;
+        color: #94A3B8;
+        border-color: #3B4255;
     }
 
     #procedure-list li,
     #history-list li {
-        background-color: #34495e;
-        border-color: $line-color;
+        background-color: #2F3545;
+        border-color: #3B4255;
     }
 
     #procedure-list li:hover {
-        background-color: rgba($primary-purple, 0.3);
-        border-color: $primary-purple;
+        background-color: rgba(168, 85, 247, 0.2);
+        border-color: #A855F7;
     }
 
     #history-list li:hover {
-        background-color: #4b6680;
-        border-color: $primary-purple;
+        background-color: rgba(168, 85, 247, 0.2);
+        border-color: #A855F7;
     }
 
     .footer-btn,
     .theme-btn {
-        background-color: #34495e;
-        color: $text-dark-mode-secondary; // Changed from $text-light
-        border-color: $line-color;
+        background-color: #1E2230;
+        color: #94A3B8;
+        border-color: #3B4255;
         &:hover {
-            background-color: $primary-purple;
-            color: white;
-            border-color: $primary-purple;
+            background-color: #2F3545;
+            color: #F8FAFC;
+            border-color: #64748B;
         }
     }
 
     .footer-logo {
-        color: color.adjust($primary-purple, $lightness: 15%);
+        color: #A855F7;
         .logo-svg rect {
-            fill: color.adjust($primary-purple, $lightness: 15%);
+            fill: #A855F7;
         }
     }
 
+    // SVG Specific Colors that need to be neon/vivid in Dark Mode
     .sum-line-svg {
-        stroke: $text-dark-mode-primary; // Changed from $result-dark
+        stroke: #F8FAFC;
     }
 
     .place-value-label {
-        fill: $text-dark-mode-secondary; // Changed from $text-light
+        fill: #94A3B8;
     }
     
     .decimal-point {
-        fill: $text-dark-mode-primary; // Changed from $result-dark
+        fill: #F8FAFC;
     }
 
     .result-text {
-        fill: $strong-green; // Changed from $text-dark-mode-primary
+        fill: #4ADE80;
+    }
+    
+    .num1-text {
+        fill: #3B82F6; // Brilliant Blue
+    }
+    
+    .num2-text {
+        fill: #4ADE80; // Bright Green
+    }
+    
+    .carry-text {
+        fill: #F97316; // Vivid Orange
     }
 
     .github-btn:hover {
-        background-color: color.adjust(#24292e, $lightness: -5%); // Darken GitHub's own dark color
-        color: white;
-        border-color: color.adjust(#24292e, $lightness: -5%);
+        background-color: #2F3545;
+        color: #F8FAFC;
+        border-color: #64748B;
     }
 }
