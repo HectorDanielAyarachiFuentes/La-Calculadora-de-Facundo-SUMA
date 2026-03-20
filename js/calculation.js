@@ -4,6 +4,7 @@ import { Elements, setUIMode, UIState } from './ui.js';
 import { setExplanation, createSvgElement, sleep, SVG_WIDTH, COLUMN_WIDTH, END_X, Y_LABELS, Y_CARRY, Y_START, ROW_HEIGHT } from './utils.js';
 import { addCalculationToHistory, getCalculationHistory } from './history.js';
 import { setupVoiceReader, leerEnVoz } from './voiceAssistant.js';
+import { launchConfetti } from './confetti.js';
 
 // --- ESTADO GLOBAL DE CÁLCULO DENTRO DEL MÓDULO ---
 export let currentCalculationData = null;
@@ -285,6 +286,13 @@ async function performMultiLineStepByStep(paddedNumbers, decimalPos, myCalcId) {
     }
     
     if (currentCalculationId !== myCalcId) return;
+
+    // 🎉 Modo Práctica: ¡Felicitar al alumno con confeti!
+    if (UIState.isPracticeMode) {
+        setExplanation('🎉 ¡Felicitaciones! ¡Completaste toda la suma correctamente!');
+        leerEnVoz('¡Felicitaciones! ¡Lo lograste! ¡Eres muy inteligente!');
+        launchConfetti();
+    }
 
     Elements.svg.querySelector('#highlight-rect')?.setAttribute('x', -1000);
     const finalFloatingCarry = Elements.svg.querySelector('.carry-text');
