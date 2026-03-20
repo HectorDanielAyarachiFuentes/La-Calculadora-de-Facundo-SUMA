@@ -206,6 +206,24 @@
     .edit-input {
         font-size: 1.8rem;
     }
+
+    .playback-options {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .speed-control {
+        width: 100%;
+        justify-content: stretch;
+
+        .speed-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 0.45rem 0.5rem;
+        }
+    }
 }
 
 // Estilos interactivos para el Modo Práctica
