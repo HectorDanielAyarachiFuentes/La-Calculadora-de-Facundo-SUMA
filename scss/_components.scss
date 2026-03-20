@@ -234,3 +234,57 @@
   30%, 50%, 70% { transform: translate(calc(-50% - 6px), -50%); }
   40%, 60% { transform: translate(calc(-50% + 6px), -50%); }
 }
+
+// Estilos del Toggle para el Modo Práctica (Botón personalizado)
+.hidden-checkbox {
+    display: none;
+}
+
+.btn-practice-mode {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0.8rem 1.8rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-color);
+    background-color: var(--container-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    user-select: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    svg.practice-icon {
+        width: 26px;
+        height: 26px;
+        transition: transform 0.4s ease;
+    }
+
+    &:hover {
+        border-color: #A855F7;
+        color: #A855F7;
+        transform: translateY(-2px);
+    }
+}
+
+// Estado activado (Modo Práctica = ON)
+.hidden-checkbox:checked + .btn-practice-mode {
+    background: linear-gradient(135deg, #A855F7, #9333EA);
+    border-color: #A855F7;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+
+    svg.practice-icon {
+        transform: scale(1.15) rotate(-8deg);
+    }
+    
+    // When active, hover effect is lighter
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 25px rgba(168, 85, 247, 0.7);
+        color: #ffffff;
+    }
+}
