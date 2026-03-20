@@ -4,7 +4,7 @@ import { Elements, UIState, addNumber as uiAddNumber, renderOperands as uiRender
          handleDeleteNumber as uiHandleDeleteNumber, handleEnterEditMode as uiHandleEnterEditMode,
          handleSaveEdit as uiHandleSaveEdit, setUIMode, resetCalculator as uiResetCalculator } from './ui.js';
 
-import { setExplanation } from './utils.js';
+import { setExplanation, setSpeedMultiplier } from './utils.js';
 import { loadHistory, getCalculationHistory } from './history.js';
 import { applyInitialTheme, toggleTheme } from './theme.js';
 import { readRandomMotivation } from './voiceAssistant.js';
@@ -88,6 +88,59 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentCalculationData) {
                 if (window.speechSynthesis) window.speechSynthesis.cancel(); // Detener voz anterior
                 uiCallbacks.replayHandler();
+            }
+        });
+    }
+
+    if (Elements.speedBtns) {
+        Elements.speedBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                Elements.speedBtns.forEach(b => b.classList.remove('active'));
+                const targetBtn = e.currentTarget;
+                targetBtn.classList.add('active');
+                setSpeedMultiplier(parseFloat(targetBtn.dataset.speed));
+            });
+        });
+    }
+
+    if (Elements.downloadBtn) {
+        Elements.downloadBtn.addEventListener('click', async () => {
+            if (typeof html2canvas === 'undefined') {
+                console.error('html2canvas no está cargado');
+                return;
+            }
+            try {
+                // Capturar el contenedor principal para que tenga fondo, bordes y título
+                const container = document.querySelector('.container');
+                
+                // Añadir clase que oculta lo innecesario y expande el procedimiento
+                container.classList.add('exporting');
+                
+                // Añadir padding extra inferior al container para compensar la falta del footer visual
+                const origContainerPadding = container.style.paddingBottom;
+                container.style.paddingBottom = '2rem';
+
+                // Necesitamos esperar un breve instante para que el navegador aplique los estilos (y las animaciones se detengan)
+                await new Promise(r => setTimeout(r, 100));
+
+                // Capturar
+                const canvas = await html2canvas(container, {
+                    scale: 2,
+                    backgroundColor: null, // Mantiene la transparencia fuera de los bordes redondeados
+                    useCORS: true
+                });
+                
+                // Restaurar todo
+                container.classList.remove('exporting');
+                container.style.paddingBottom = origContainerPadding;
+                
+                const imgData = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `Suma_Facundo_${Date.now()}.png`;
+                link.href = imgData;
+                link.click();
+            } catch (error) {
+                console.error('Error al capturar la imagen:', error);
             }
         });
     }

@@ -9,6 +9,8 @@ export const Elements = {
     calculateBtn: document.getElementById('calculateBtn'),
     resetBtn: document.getElementById('resetBtn'),
     replayBtn: document.getElementById('replayBtn'),
+    downloadBtn: document.getElementById('downloadBtn'),
+    speedBtns: document.querySelectorAll('.speed-btn'),
     svg: document.getElementById('calculation-svg'),
     explanationText: document.getElementById('explanation-text'), // Ya se usa en utils, pero se puede tener aquí para consistencia
     historyList: document.getElementById('history-list'),
@@ -139,6 +141,7 @@ export function setUIMode(mode) {
     Elements.addBtn.classList.toggle('hidden', mode !== 'input'); // AddBtn también es parte del input
     Elements.calculateBtn.classList.toggle('hidden', mode !== 'input');
     Elements.replayBtn.classList.toggle('hidden', mode !== 'result');
+    if (Elements.downloadBtn) Elements.downloadBtn.classList.toggle('hidden', mode !== 'result');
     Elements.operandsContainer.classList.toggle('hidden', mode !== 'input');
     Elements.svg.classList.toggle('hidden', mode === 'input');
     Elements.procedureSection.classList.toggle('hidden', mode !== 'result'); // Ocultar al cambiar de modo

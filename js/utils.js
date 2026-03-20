@@ -1,5 +1,11 @@
 // js/utils.js
 
+export let speedMultiplier = 1.0;
+
+export function setSpeedMultiplier(val) {
+    speedMultiplier = val;
+}
+
 export const SVG_WIDTH = 460;
 export const COLUMN_WIDTH = 35;
 export const END_X = SVG_WIDTH - 40;
@@ -44,8 +50,8 @@ export function setExplanation(text) {
 /**
  * Espera un número de milisegundos.
  * @param {number} ms - El tiempo en milisegundos.
- * @returns {Promise<void>} Una promesa que se resuelve después del tiempo especificado.
+ * @returns {Promise<void>} Una promesa que se resuelve después del tiempo especificado (afectado por el speedMultiplier).
  */
 export function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms * speedMultiplier));
 }

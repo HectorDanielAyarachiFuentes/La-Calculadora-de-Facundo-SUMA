@@ -30,6 +30,8 @@
     
     <!-- ✅ CORRECCIÓN 1: Color del favicon arreglado -->
   <link rel="icon" href="calculadorafavicon.svg" type="image/svg+xml" sizes="any">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -42,7 +44,14 @@
         <header>
             <div class="header-top">
                  <h1>🧮 La Calculadora de Facundo +</h1>
-                 <button id="theme-toggle-btn" class="theme-btn" aria-label="Cambiar tema">🌙</button>
+                 <div class="header-controls">
+                     <div class="speed-control" aria-label="Velocidad de Animación">
+                         <button class="speed-btn" data-speed="2.0" title="Tortuga (Lento)">🐢</button>
+                         <button class="speed-btn active" data-speed="1.0" title="Persona (Normal)">🚶</button>
+                         <button class="speed-btn" data-speed="0.25" title="Rayo (Rápido)">⚡</button>
+                     </div>
+                     <button id="theme-toggle-btn" class="theme-btn" aria-label="Cambiar tema">🌙</button>
+                 </div>
             </div>
             <p class="subtitle">Una experiencia de suma visual e interactiva.</p>
         </header>
@@ -66,6 +75,7 @@
                 <div class="controls">
                     <button id="calculateBtn" class="btn-calculate" disabled>¡A Sumar!</button>
                     <button id="replayBtn" class="btn-replay hidden">Repetir Animación</button>
+                    <button id="downloadBtn" class="btn-download hidden">📥 Descargar Suma</button>
                     <button id="resetBtn" class="btn-reset">Nueva Suma</button>
                 </div>
                 <!-- Toggle Modo Práctica -->

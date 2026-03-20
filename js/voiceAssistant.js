@@ -1,6 +1,7 @@
 // js/voiceAssistant.js
 
 import { Elements } from './ui.js'; // Necesario para Elements.procedureList
+import { speedMultiplier } from './utils.js'; // Obtenemos el multiplicador actual
 
 // --- Funciones de conversión de números a letras ---
 const unidades = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"];
@@ -46,7 +47,15 @@ export function leerEnVoz(texto) {
     if ('speechSynthesis' in window) {
         const utter = new SpeechSynthesisUtterance(texto);
         utter.lang = 'es-ES';
-        utter.rate = 1.0;
+        
+        // speedMultiplier: 2.0 (lento) -> rate 0.5
+        // speedMultiplier: 1.0 (normal) -> rate 1.0
+        // speedMultiplier: 0.25 (rápido) -> rate 4.0 (lo limitamos a 2.5 para que sea comprensible)
+        let rateValue = 1.0 / speedMultiplier;
+        if (rateValue > 2.5) rateValue = 2.5;
+        
+        utter.rate = rateValue;
+        
         window.speechSynthesis.cancel();
         window.speechSynthesis.speak(utter);
     } else {
