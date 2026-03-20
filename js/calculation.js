@@ -1,14 +1,15 @@
 // js/calculation.js
 
-import { Elements, setUIMode } from './ui.js';
+import { Elements, setUIMode, UIState } from './ui.js';
 import { setExplanation, createSvgElement, sleep, SVG_WIDTH, COLUMN_WIDTH, END_X, Y_LABELS, Y_CARRY, Y_START, ROW_HEIGHT } from './utils.js';
 import { addCalculationToHistory, getCalculationHistory } from './history.js';
-import { setupVoiceReader } from './voiceAssistant.js';
+import { setupVoiceReader, leerEnVoz } from './voiceAssistant.js';
 
 // --- ESTADO GLOBAL DE CÁLCULO DENTRO DEL MÓDULO ---
 export let currentCalculationData = null;
 export let procedureSteps = [];
 export let hasExplainedPaddingZero = false; // Para el tutor de voz
+let currentCalculationId = 0; // Token para abortar cálculos huérfanos
 
 /**
  * Resetea el estado de cálculo a sus valores iniciales.
@@ -17,6 +18,7 @@ export function resetCalculationState() {
     currentCalculationData = null;
     procedureSteps = [];
     hasExplainedPaddingZero = false;
+    currentCalculationId++; // Aborta cualquier cálculo previo en curso
     Elements.svg.innerHTML = ''; // Limpiar SVG al resetear
     Elements.procedureList.innerHTML = ''; // Limpiar lista de procedimientos
     Elements.procedureSection.classList.add('hidden'); // Ocultar sección de procedimiento
@@ -29,6 +31,9 @@ export function resetCalculationState() {
  * @returns {Promise<void>}
  */
 export async function startCalculation(numbersToSum, replayData = null) {
+    currentCalculationId++; 
+    const myCalcId = currentCalculationId;
+
     setUIMode('calculating');
     Elements.procedureSection.classList.add('hidden');
     Elements.procedureList.innerHTML = '';
@@ -85,12 +90,14 @@ export async function startCalculation(numbersToSum, replayData = null) {
 
     currentCalculationData = calculationData;
     const { paddedNumbers, decimalPosition } = currentCalculationData;
-    await animateMultiSum(paddedNumbers, decimalPosition);
+    await animateMultiSum(paddedNumbers, decimalPosition, myCalcId);
 
-    setUIMode('result');
-    renderProcedure();
-    setupVoiceReaderForCurrentCalculation();
-    setupProcedureHover();
+    if (currentCalculationId === myCalcId) {
+        setUIMode('result');
+        renderProcedure();
+        setupVoiceReaderForCurrentCalculation();
+        setupProcedureHover();
+    }
 }
 
 /**
@@ -99,14 +106,85 @@ export async function startCalculation(numbersToSum, replayData = null) {
  * @param {number} decimalPos - La posición del punto decimal.
  * @returns {Promise<void>}
  */
-async function animateMultiSum(paddedNumbers, decimalPos) {
+async function animateMultiSum(paddedNumbers, decimalPos, myCalcId) {
     procedureSteps = [];
     const numDigits = paddedNumbers[0].length;
     const requiredHeight = Y_START + (paddedNumbers.length + 2) * ROW_HEIGHT;
     Elements.svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} ${requiredHeight}`);
     Elements.svg.innerHTML = '';
     setupMultiLineSVG(paddedNumbers, decimalPos);
-    await performMultiLineStepByStep(paddedNumbers, decimalPos);
+    await performMultiLineStepByStep(paddedNumbers, decimalPos, myCalcId);
+}
+
+/**
+ * Pide al usuario que ingrese un número durante el Modo Práctica (Promesa).
+ */
+async function requireUserInput(x, y, correctAnswer, type) {
+    return new Promise((resolve) => {
+        // Columna es de 35px. Caja un poco más ancha para estar cómoda pero no solapar.
+        const boxWidth = 38;
+        const boxHeight = 48;
+        
+        const fo = createSvgElement('foreignObject', {
+            x: x - boxWidth / 2, 
+            y: y - boxHeight / 2, 
+            width: boxWidth,
+            height: boxHeight,
+            style: 'overflow: visible;' // Para no recortar el box-shadow (resplandor)
+        });
+        
+        const inputDiv = document.createElement('div');
+        inputDiv.style.width = '100%';
+        inputDiv.style.height = '100%';
+        inputDiv.style.display = 'flex';
+        inputDiv.style.alignItems = 'center';
+        inputDiv.style.justifyContent = 'center';
+        
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.className = 'practice-input-overlay';
+        input.style.width = '100%';
+        input.style.height = '100%';
+        
+        if (type === 'carry') {
+            input.style.fontSize = '20px';
+            input.style.borderColor = '#3B82F6'; 
+            input.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.6)';
+        } else {
+            input.style.fontSize = '26px';
+        }
+        
+        inputDiv.appendChild(input);
+        fo.appendChild(inputDiv);
+        Elements.svg.appendChild(fo);
+        
+        setTimeout(() => input.focus(), 50);
+        
+        function checkAnswer() {
+            if (input.value === '') return;
+            if (parseInt(input.value, 10) === correctAnswer) {
+                leerEnVoz(['¡Correcto!', '¡Muy bien!', '¡Excelente!'][Math.floor(Math.random() * 3)]);
+                Elements.svg.removeChild(fo);
+                resolve();
+            } else {
+                input.classList.remove('shake-error');
+                void input.offsetWidth;
+                input.classList.add('shake-error');
+                leerEnVoz('Intenta otra vez.');
+                input.value = '';
+            }
+        }
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+        
+        input.addEventListener('input', () => {
+             if (input.value.length >= correctAnswer.toString().length) {
+                 checkAnswer();
+             }
+        });
+    });
 }
 
 /**
@@ -115,17 +193,22 @@ async function animateMultiSum(paddedNumbers, decimalPos) {
  * @param {number} decimalPos - La posición del punto decimal.
  * @returns {Promise<void>}
  */
-async function performMultiLineStepByStep(paddedNumbers, decimalPos) {
+async function performMultiLineStepByStep(paddedNumbers, decimalPos, myCalcId) {
     let carry = 0;
     const numDigits = paddedNumbers[0].length;
     const resultY = Y_START + (paddedNumbers.length + 1) * ROW_HEIGHT;
     let allCarries = [];
 
     for (let i = 0; i < numDigits; i++) {
+        if (currentCalculationId !== myCalcId) return; // Abortar si hubo reinicio
         const digitIndex = numDigits - 1 - i;
         const x = END_X - (i * COLUMN_WIDTH);
-        Elements.svg.querySelector('#highlight-rect').setAttribute('x', x - COLUMN_WIDTH / 2);
-        await sleep(1200);
+        Elements.svg.querySelector('#highlight-rect')?.setAttribute('x', x - COLUMN_WIDTH / 2);
+        
+        if (!UIState.isPracticeMode) {
+            await sleep(1200);
+            if (currentCalculationId !== myCalcId) return; // Abortar tras pausa
+        }
 
         let columnSum = carry;
         let explanationDigits = [];
@@ -141,21 +224,51 @@ async function performMultiLineStepByStep(paddedNumbers, decimalPos) {
         carry = newCarry;
 
         setExplanation(`Columna: ...${columnSum}. Se escribe ${digitForColumn}, se lleva ${carry}.`);
+        
+        if (UIState.isPracticeMode) {
+            setExplanation(`¡Tu turno! ¿Cuánto es la suma principal de esta columna?`);
+            await requireUserInput(x, resultY, digitForColumn, 'result');
+            if (currentCalculationId !== myCalcId) return; // Abortar si cambiaron en medio del input
+        }
+        
         Elements.svg.appendChild(createSvgElement('text', { x, y: resultY, class: 'digit result-text' }, digitForColumn));
 
         const prevCarryElement = Elements.svg.querySelector('.carry-text');
         if (prevCarryElement) prevCarryElement.remove();
         if (carry > 0) {
             allCarries.push({ value: carry, x: x - COLUMN_WIDTH });
+            
+            if (UIState.isPracticeMode) {
+                setExplanation(`¿Y cuánto nos llevamos a la siguiente columna?`);
+                await requireUserInput(x - COLUMN_WIDTH, Y_CARRY, carry, 'carry');
+                if (currentCalculationId !== myCalcId) return;
+            }
+            
             Elements.svg.appendChild(createSvgElement('text', { x: x - COLUMN_WIDTH, y: Y_CARRY, class: 'digit carry-text' }, carry));
         }
-        await sleep(1500);
+        
+        if (!UIState.isPracticeMode) {
+            await sleep(1500);
+        } else {
+            await sleep(400); // Pausa corta tras el éxito en modo práctica
+        }
     }
+
+    if (currentCalculationId !== myCalcId) return;
 
     if (carry > 0) {
         setExplanation(`¡Casi terminamos! Agregamos la llevada que nos quedó, el ${carry}. Como no hay más que sumar, la ponemos abajo.`);
-        await sleep(1500);
-        Elements.svg.appendChild(createSvgElement('text', { x: END_X - (numDigits * COLUMN_WIDTH), y: resultY, class: 'digit result-text' }, carry));
+        
+        const finalX = END_X - (numDigits * COLUMN_WIDTH);
+        if (UIState.isPracticeMode) {
+            setExplanation(`El último paso. ¿Qué número baja directo?`);
+            await requireUserInput(finalX, resultY, carry, 'result');
+            if (currentCalculationId !== myCalcId) return;
+        } else {
+            await sleep(1500);
+            if (currentCalculationId !== myCalcId) return;
+        }
+        Elements.svg.appendChild(createSvgElement('text', { x: finalX, y: resultY, class: 'digit result-text' }, carry));
         procedureSteps.push({
             digits: [],
             carryIn: carry,
@@ -170,8 +283,10 @@ async function performMultiLineStepByStep(paddedNumbers, decimalPos) {
         setExplanation("¡Muy bien! Y como no nos llevamos nada, la cuenta está terminada.");
         await sleep(1500);
     }
+    
+    if (currentCalculationId !== myCalcId) return;
 
-    Elements.svg.querySelector('#highlight-rect').setAttribute('x', -1000);
+    Elements.svg.querySelector('#highlight-rect')?.setAttribute('x', -1000);
     const finalFloatingCarry = Elements.svg.querySelector('.carry-text');
     if (finalFloatingCarry) finalFloatingCarry.remove();
     allCarries.forEach(c => Elements.svg.appendChild(createSvgElement('text', { x: c.x, y: Y_CARRY, class: 'digit carry-text' }, c.value)));

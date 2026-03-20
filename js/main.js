@@ -81,6 +81,17 @@ document.addEventListener('DOMContentLoaded', () => {
     Elements.motivationForAdultBtn.addEventListener('click', uiCallbacks.motivationForAdultHandler);
     Elements.themeToggleBtn.addEventListener('click', uiCallbacks.themeToggleHandler);
 
+    if (Elements.practiceModeToggle) {
+        Elements.practiceModeToggle.addEventListener('change', (e) => {
+            UIState.isPracticeMode = e.target.checked;
+            // Si el niño ya está en media suma o terminó la suma, reiniciar automáticamente
+            if (currentCalculationData) {
+                if (window.speechSynthesis) window.speechSynthesis.cancel(); // Detener voz anterior
+                uiCallbacks.replayHandler();
+            }
+        });
+    }
+
     // Los event listeners del hover del procedimiento se configuran desde calculation.js
     // ya que necesitan acceso a `procedureSteps` que está en ese módulo.
     // Solo necesitamos asegurarnos de que `setupProcedureHover` se llame cuando sea necesario.

@@ -20,12 +20,14 @@ export const Elements = {
     motivationForKidBtn: document.getElementById('motivationForKid'),
     motivationForAdultBtn: document.getElementById('motivationForAdult'),
     themeToggleBtn: document.getElementById('theme-toggle-btn'),
+    practiceModeToggle: document.getElementById('practiceModeToggle'),
 };
 
 // --- 2. ESTADO GLOBAL DE UI ---
 export const UIState = {
     numbersToSum: [],
     editingIndex: null,
+    isPracticeMode: false,
 };
 
 // --- 4. LÓGICA DE LA INTERFAZ ---
@@ -247,6 +249,12 @@ export function setupUIEventListeners(callbacks) {
     Elements.motivationForKidBtn.addEventListener('click', callbacks.motivationForKidHandler);
     Elements.motivationForAdultBtn.addEventListener('click', callbacks.motivationForAdultHandler);
     Elements.themeToggleBtn.addEventListener('click', callbacks.themeToggleHandler);
+    
+    if (Elements.practiceModeToggle) {
+        Elements.practiceModeToggle.addEventListener('change', (e) => {
+            UIState.isPracticeMode = e.target.checked;
+        });
+    }
 
     // Los event listeners para el hover del procedimiento se añadirán en la lógica de cálculo
     // ya que necesitan acceso a `procedureSteps`

@@ -187,3 +187,50 @@
         font-size: 1.8rem;
     }
 }
+
+// Estilos interactivos para el Modo Práctica
+.practice-input-overlay {
+    // Al estar dentro del flexbox del foreignObject, no necesitamos position absolute ni translate
+    background-color: #1E2230; // Fondo semioscuro para tapar la línea blanca que pasa por detrás
+    border: 2px solid #F97316; // Orange border by default
+    border-radius: 6px;
+    color: #F8FAFC; 
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.6);
+    transition: all 0.2s ease;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    display: block;
+    
+    // Hide number spin buttons
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    &[type=number] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    &:focus {
+        border-color: #A855F7;
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.7);
+    }
+
+    &.shake-error {
+        animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        border-color: #ef4444; // Red
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+    }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate(calc(-50% - 2px), -50%); }
+  20%, 80% { transform: translate(calc(-50% + 4px), -50%); }
+  30%, 50%, 70% { transform: translate(calc(-50% - 6px), -50%); }
+  40%, 60% { transform: translate(calc(-50% + 6px), -50%); }
+}
